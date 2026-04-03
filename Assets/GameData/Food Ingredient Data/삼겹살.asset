@@ -15,10 +15,15 @@ MonoBehaviour:
   ingredientName: "\uC0BC\uACB9\uC0B4"
   baseScore: 20
   type: 1
+  rarity: 0
+  sprite: {fileID: 7781682652552636025, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
   synergies:
   - trigger:
       rid: -2
     effects: []
+  isAdvanced: 0
+  advancedBaseScore: 0
+  advancedSynergies: []
   references:
     version: 2
     RefIds:

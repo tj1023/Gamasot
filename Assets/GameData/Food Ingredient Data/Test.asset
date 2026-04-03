@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6823a0646cef6fd4bad0bb928dbc137e, type: 3}
-  m_Name: "\uACE0\uAE30 \uC644\uC790"
+  m_Name: Test
   m_EditorClassIdentifier: Assembly-CSharp::Architecture.FoodIngredientData
-  ingredientName: "\uACE0\uAE30 \uC644\uC790"
-  baseScore: 10
-  type: 4
+  ingredientName: Test
+  baseScore: 1
+  type: 0
   rarity: 0
-  sprite: {fileID: -2432301806248295829, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
+  sprite: {fileID: -7576874432042752839, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
   synergies: []
   isAdvanced: 0
   advancedBaseScore: 0

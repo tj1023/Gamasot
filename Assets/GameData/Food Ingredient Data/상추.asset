@@ -15,7 +15,12 @@ MonoBehaviour:
   ingredientName: "\uC0C1\uCD94"
   baseScore: 10
   type: 2
+  rarity: 0
+  sprite: {fileID: 7355374725913390886, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
   synergies: []
+  isAdvanced: 0
+  advancedBaseScore: 0
+  advancedSynergies: []
   references:
     version: 2
     RefIds: []

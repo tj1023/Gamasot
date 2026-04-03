@@ -15,7 +15,12 @@ MonoBehaviour:
   ingredientName: "\uC465\uAC13"
   baseScore: 15
   type: 2
+  rarity: 1
+  sprite: {fileID: -4074711270985794095, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
   synergies: []
+  isAdvanced: 0
+  advancedBaseScore: 0
+  advancedSynergies: []
   references:
     version: 2
     RefIds: []
