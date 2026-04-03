@@ -54,7 +54,7 @@ namespace Architecture
             {
                 if (ingredient != null)
                 {
-                    context.CurrentScore += ingredient.baseScore;
+                    context.CurrentScore += ingredient.ActiveBaseScore;
                 }
             }
 
@@ -65,7 +65,7 @@ namespace Architecture
             {
                 if (ingredient == null) continue;
 
-                foreach (var synergy in ingredient.synergies)
+                foreach (var synergy in ingredient.ActiveSynergies)
                 {
                     // 조건 확인 및 효과 적용. Data-Driven 방식이므로
                     // 소스코드 변경 없이 인스펙터 상에서 조합된 효과들이 일괄 적용됩니다.

@@ -18,6 +18,13 @@ namespace Architecture
         // Spice = 7,
         // Sauce = 8
     }
+
+    public enum Rarity
+    {
+        Common = 0,
+        Rare = 1,
+        Legendary = 2
+    }
     
     /// <summary>
     /// 각 재료의 기본 명세(BaseScore 등)와 고유 시너지 효과를 들고 있는 데이터입니다.
@@ -30,9 +37,20 @@ namespace Architecture
         public string ingredientName;           // 요소 이름
         public int baseScore;                   // 덱에 추가되었을 때 기본 점수
         public IngredientType type;             // 재료 속성 (채소, 육류 등)
+        public Rarity rarity;
+        public SpriteRenderer spriteRenderer;
 
         [Header("시너지 시스템")]
         [Tooltip("고유 시너지 규칙 (트리거+이펙트를 리스트로 조합)")]
         public List<SynergyData> synergies = new();
+
+        [Header("고급 속성")]
+        [Tooltip("현재 재료가 고급 상태인지 여부")]
+        public bool isAdvanced;
+        public int advancedBaseScore;
+        public List<SynergyData> advancedSynergies = new();
+        
+        public int ActiveBaseScore => isAdvanced ? advancedBaseScore : baseScore;
+        public List<SynergyData> ActiveSynergies => isAdvanced ? advancedSynergies : synergies;
     }
 }
