@@ -6,6 +6,7 @@ namespace Gameplay
 {
     /// <summary>
     /// 솥 내부를 떠다니는 재료 오브젝트의 행동을 제어합니다.
+    /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
     public class IngredientNode : MonoBehaviour
     {
@@ -16,7 +17,7 @@ namespace Gameplay
         private Rigidbody2D _rb;
         private SpriteRenderer _spriteRenderer;
         
-        public FoodIngredientData CurrentData { get; private set; }
+        public RuntimeIngredient RuntimeData { get; private set; }
         
         // 풀 회수 콜백용 (선택적 사용)
         public Action<IngredientNode> OnDestroyNode;
@@ -31,7 +32,8 @@ namespace Gameplay
 
         public void Initialize(FoodIngredientData data)
         {
-            CurrentData = data;
+            // 인스턴스마다 독립적인 런타임 데이터 생성
+            RuntimeData = new RuntimeIngredient(data);
             
             // 데이터 기반 비주얼 갱신 (예시: ScriptableObject의 스프라이트 복사)
             if (data.sprite != null)

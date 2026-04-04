@@ -18,6 +18,9 @@ namespace Gameplay
         [SerializeField] private int defaultCapacity = 20;
         [SerializeField] private int maxSize = 100;
         
+        [Header("Test")]
+        [SerializeField] private FoodIngredientData[] testIngredients;
+        
         private ObjectPool<IngredientNode> _ingredientPool;
 
         private void Awake()
@@ -71,10 +74,8 @@ namespace Gameplay
         [ContextMenu("Spawn Dummy Ingredient")]
         private void SpawnTest()
         {
-            // 테스트용 빈 데이터
-            var dummyData = ScriptableObject.CreateInstance<FoodIngredientData>();
-            dummyData.ingredientName = "Test";
-            SpawnIngredient(dummyData);
+            foreach (var t in testIngredients)
+                SpawnIngredient(t);
         }
     }
 }
