@@ -98,7 +98,10 @@ namespace Gameplay
         private void ScoopIngredients(Vector2 scoopPos)
         {
             int count = Physics2D.OverlapCircle(scoopPos, scoopRadius, _ingredientFilter, _overlapResults);
-            
+
+            // 새롭게 건져진 재료들만 담을 임시 리스트
+            List<RuntimeIngredient> newHarvested = new List<RuntimeIngredient>(count);
+
             for (int i = 0; i < count; i++)
             {
                 IngredientNode node = _overlapResults[i].GetComponent<IngredientNode>();
@@ -108,16 +111,20 @@ namespace Gameplay
                 {
                     // 1. 추출한 데이터 이동 (현재는 내부 리스트, 후속 작업 시 GameContext 주입 등)
                     HarvestedIngredients.Add(node.RuntimeData);
+                    newHarvested.Add(node.RuntimeData);
                     
                     // 2. 풀로 반환
                     ingredientManager.ReturnToPool(node);
                 }
             }
             
-            // TODO: (참고) 여기서 시너지 계산을 직접 하지 않고,
-            // Architecture 폴더에 있는 EventBus 등을 통해 
-            // "EventBus.Instance.TriggerEvent(new ItemsHarvestedEvent(HarvestedIngredients));"
-            // 형태로 설계하면 클래스간 결합도 낮출 수 있음
+            if (newHarvested.Count > 0)
+            {
+                EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
+                {
+                    NewHarvestedItems = newHarvested
+                });
+            }
         }
 
         private void OnDisable()

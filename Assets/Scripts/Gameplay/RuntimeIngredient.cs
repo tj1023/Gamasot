@@ -13,7 +13,25 @@ namespace Gameplay
         /// <summary>
         /// 시너지 효과 등으로 런타임에 변동되는 실제 점수
         /// </summary>
-        public int CurrentScore { get; set; }
+        private int _currentScore;
+        public int CurrentScore
+        {
+            get => _currentScore;
+            set
+            {
+                if (_currentScore != value)
+                {
+                    int oldScore = _currentScore;
+                    _currentScore = value;
+                    EventBus<IngredientScoreChangedEvent>.Publish(new IngredientScoreChangedEvent
+                    {
+                        Ingredient = this,
+                        OldScore = oldScore,
+                        NewScore = value
+                    });
+                }
+            }
+        }
 
         public RuntimeIngredient(FoodIngredientData data)
         {
