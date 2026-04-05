@@ -1,19 +1,38 @@
 using System.Collections.Generic;
+using Gameplay;
 
 namespace Architecture
 {
+    public enum GamePhase
+    {
+        None,
+        OnScoop,
+        OnSettlement
+    }
+
     /// <summary>
     /// 게임 모델/데이터 컨테이너입니다.
-    /// 이벤트 버스를 통해 데이터를 직접 주고받을 수도 있지만,
-    /// FSM 전환 시나 시너지 Trigger/Effect 발동 시 전역 컨텍스트(데이터)를 전달하여
+    /// FSM 및 시너지 Trigger/Effect 발동 시 전역 컨텍스트(데이터)를 전달하여
     /// 서로 다른 시스템 간 결합도를 낮추기 위해 사용됩니다.
     /// </summary>
     public class GameContext
     {
-        // 런타임 동안 모은 점수
-        public int CurrentScore { get; set; }
+        // 런타임 동안 모은 점수 (필요 시 전역 점수로 활용)
+        public int GlobalScore { get; set; }
+
+        public GamePhase CurrentPhase { get; set; }
         
-        // 현재 수집/선택된 재료 목록 (시너지 판단용)
-        public List<FoodIngredientData> CurrentIngredients { get; set; } = new();
+        // 현재 이벤트를 발동시킨 주체 재료
+        public RuntimeIngredient Source { get; set; }
+
+        // 현재 수집된 모든 재료 목록
+        public List<RuntimeIngredient> HarvestedIngredients { get; set; } = new();
+
+        // 방금 막 건져진 재료 목록 (건질 때 사용할 임시 리스트)
+        public List<RuntimeIngredient> LastScooped { get; set; } = new();
+
+        // 아직 냄비 안에 남아있는 재료 목록 
+        // (실제 게임에서는 IngredientManager 등을 통해 갱신해야 함)
+        public List<RuntimeIngredient> PotIngredients { get; set; } = new();
     }
 }

@@ -22,6 +22,9 @@ namespace Gameplay
         [SerializeField] private FoodIngredientData[] testIngredients;
         
         private ObjectPool<IngredientNode> _ingredientPool;
+        
+        // 현재 솥(Pot)에 존재하는 활성화된 재료 노드 리스트
+        public System.Collections.Generic.List<IngredientNode> ActiveIngredients { get; private set; } = new();
 
         private void Awake()
         {
@@ -37,8 +40,16 @@ namespace Gameplay
                     node.OnDestroyNode = ReturnToPool;
                     return node;
                 },
-                actionOnGet: (node) => node.gameObject.SetActive(true),
-                actionOnRelease: (node) => node.gameObject.SetActive(false),
+                actionOnGet: (node) => 
+                {
+                    node.gameObject.SetActive(true);
+                    ActiveIngredients.Add(node);
+                },
+                actionOnRelease: (node) => 
+                {
+                    ActiveIngredients.Remove(node);
+                    node.gameObject.SetActive(false);
+                },
                 actionOnDestroy: (node) => Destroy(node.gameObject),
                 collectionCheck: false, // 성능을 위해 중복 릴리스 체크 비활성화
                 defaultCapacity: defaultCapacity,

@@ -47,33 +47,45 @@ namespace Architecture
 
         private void CalculateTotalScore(GameContext context)
         {
-            context.CurrentScore = 0;
+            context.GlobalScore = 0;
+            context.CurrentPhase = GamePhase.OnSettlement;
 
             // 1. 기본 점수 합산
-            foreach (var ingredient in context.CurrentIngredients)
+            foreach (var ingredient in context.HarvestedIngredients)
             {
                 if (ingredient != null)
                 {
-                    context.CurrentScore += ingredient.ActiveBaseScore;
+                    context.GlobalScore += ingredient.CurrentScore;
                 }
             }
 
-            Debug.Log($"[Settlement] 기본 점수 합계: {context.CurrentScore}");
+            Debug.Log($"[Settlement] 기본 점수 합계: {context.GlobalScore}");
 
             // 2. 시너지(특수 효과) 발동 검사
-            foreach (var ingredient in context.CurrentIngredients)
+            foreach (var ingredient in context.HarvestedIngredients)
             {
-                if (ingredient == null) continue;
+                if (ingredient == null || ingredient.OriginalData == null) continue;
+
+                // 시너지 발동 주체를 설정
+                context.Source = ingredient;
 
                 foreach (var synergy in ingredient.ActiveSynergies)
                 {
-                    // 조건 확인 및 효과 적용. Data-Driven 방식이므로
-                    // 소스코드 변경 없이 인스펙터 상에서 조합된 효과들이 일괄 적용됩니다.
                     synergy?.EvaluateAndApply(context);
                 }
             }
+            
+            // 시너지 발동 후 다시 점수 합산 (시너지가 CurrentScore들을 변동시켰으므로)
+            context.GlobalScore = 0;
+            foreach (var ingredient in context.HarvestedIngredients)
+            {
+                if (ingredient != null)
+                {
+                    context.GlobalScore += ingredient.CurrentScore;
+                }
+            }
 
-            Debug.Log($"[Settlement] 정산 완료. 최종 점수: {context.CurrentScore}");
+            Debug.Log($"[Settlement] 정산 완료. 최종 점수: {context.GlobalScore}");
         }
     }
 }

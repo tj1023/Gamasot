@@ -120,10 +120,47 @@ namespace Gameplay
             
             if (newHarvested.Count > 0)
             {
+                // [건질 때] 시너지 발동 처리
+                ApplyScoopSynergies(newHarvested);
+
                 EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
                 {
                     NewHarvestedItems = newHarvested
                 });
+            }
+        }
+
+        private void ApplyScoopSynergies(List<RuntimeIngredient> newlyScooped)
+        {
+            // 현재 활성화된(솥 안에 있는) 재료들의 RuntimeData 추출
+            List<RuntimeIngredient> potIngredients = new List<RuntimeIngredient>(ingredientManager.ActiveIngredients.Count);
+            foreach (var node in ingredientManager.ActiveIngredients)
+            {
+                if (node != null && node.RuntimeData != null)
+                {
+                    potIngredients.Add(node.RuntimeData);
+                }
+            }
+
+            // 시너지를 위한 임시 컨텍스트 생성 (전역 컨텍스트와 동기화 시 구조에 맞게 수정 가능)
+            GameContext scoopContext = new GameContext
+            {
+                CurrentPhase = GamePhase.OnScoop,
+                HarvestedIngredients = this.HarvestedIngredients,
+                LastScooped = newlyScooped,
+                PotIngredients = potIngredients
+            };
+
+            foreach (var ingredient in newlyScooped)
+            {
+                if (ingredient == null || ingredient.OriginalData == null) continue;
+
+                scoopContext.Source = ingredient;
+
+                foreach (var synergy in ingredient.ActiveSynergies)
+                {
+                    synergy?.EvaluateAndApply(scoopContext);
+                }
             }
         }
 

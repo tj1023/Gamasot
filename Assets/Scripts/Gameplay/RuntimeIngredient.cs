@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Architecture;
 
 namespace Gameplay
@@ -36,7 +37,20 @@ namespace Gameplay
         public RuntimeIngredient(FoodIngredientData data)
         {
             OriginalData = data;
+            IsAdvanced = data.isAdvanced;
             CurrentScore = data.ActiveBaseScore;
+        }
+        
+        public bool IsAdvanced { get; private set; }
+
+        public List<SynergyData> ActiveSynergies => IsAdvanced ? OriginalData.advancedSynergies : OriginalData.synergies;
+        
+        public void TransformToAdvanced()
+        {
+            if (IsAdvanced) return;
+            
+            IsAdvanced = true;
+            CurrentScore = OriginalData.advancedBaseScore;
         }
     }
 }

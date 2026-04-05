@@ -12,11 +12,12 @@ namespace Architecture
     {
         // 다형성을 보장하는 유니티 내장 직렬화. 
         // [SerializeReference]를 통해 ITrigger 인터페이스를 구현한 어떤 클래스든 에디터 상에서 할당 가능합니다.
-        [SerializeReference]
+        // [SubclassSelector]를 통해 자식 클래스(구현체)들을 드롭다운 메뉴로 인스펙터에서 선택할 수 있습니다.
+        [SerializeReference, SubclassSelector]
         [Header("발동 조건")]
         public ITrigger trigger;
 
-        [SerializeReference]
+        [SerializeReference, SubclassSelector]
         [Header("발동 효과 목록")]
         public List<IEffect> effects = new();
 
