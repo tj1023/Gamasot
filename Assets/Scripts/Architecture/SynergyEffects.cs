@@ -5,9 +5,9 @@ using Gameplay;
 
 namespace Architecture
 {
-    // 1. 수집된 재료중 랜덤으로 1개의 점수 + n
+    // 1. 랜덤 재료 점수 += n
     [Serializable]
-    public class AddScoreToSelfEffect : IEffect
+    public class AddScoreToRandomEffect : IEffect
     {
         [Tooltip("추가할 점수량")]
         public int bonusScore;
@@ -38,10 +38,13 @@ namespace Architecture
         }
     }
 
-    // 2. 본재료에 수집된 재료중 랜덤으로 1개의 점수를 획득
+    // 2. 본재료 점수 += 랜덤 재료 점수
     [Serializable]
     public class AddRandomScoreToSelfEffect : IEffect
     {
+        [Tooltip("점수를 가져올 랜덤 재료의 개수")]
+        public int count = 1;
+
         public void Apply(GameContext context)
         {
             if (context.Source == null || context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return;
@@ -55,12 +58,17 @@ namespace Architecture
                 }
             }
 
-            if (validIngredients.Count > 0)
+            int loopCount = Mathf.Min(count, validIngredients.Count);
+            int totalBonus = 0;
+
+            for (int i = 0; i < loopCount; i++)
             {
                 int randomIndex = UnityEngine.Random.Range(0, validIngredients.Count);
-                int randomIngredientScore = validIngredients[randomIndex].CurrentScore;
-                context.Source.CurrentScore += randomIngredientScore;
+                totalBonus += validIngredients[randomIndex].CurrentScore;
+                validIngredients.RemoveAt(randomIndex);
             }
+
+            context.Source.CurrentScore += totalBonus;
         }
     }
 
@@ -100,7 +108,7 @@ namespace Architecture
 
     // 5. 확률로 자신과 이름이 다른 재료 1개를 [고급]으로 전환
     [Serializable]
-    public class TransformOtherIntoPremiumEffect : IEffect
+    public class TransformOtherToAdvancedEffect : IEffect
     {
         public float probability = 0.5f;
 
@@ -135,7 +143,7 @@ namespace Architecture
 
     // 6. 냄비 안의 모든 Type:X의 점수 +n
     [Serializable]
-    public class AddScoreToTypeInPotEffect : IEffect
+    public class AddScoreInPotEffect : IEffect
     {
         public IngredientType targetType;
         public int bonusScore;
@@ -154,7 +162,7 @@ namespace Architecture
 
     // 7. 모든(수집된) 재료의 점수 +n
     [Serializable]
-    public class AddScoreToAllHarvestedIngredientsEffect : IEffect
+    public class AddScoreToAllHarvestedEffect : IEffect
     {
         public int bonusScore;
 
@@ -167,25 +175,38 @@ namespace Architecture
         }
     }
 
-    // 8. 점수가 가장 높은 재료 1개의 점수를 얻음
+    // 8. 점수가 가장 높은 재료 n개의 점수를 얻음
     [Serializable]
-    public class AddRandomBonusToHighestScoreIngredientEffect : IEffect
+    public class AddHighestScoreToSelfEffect : IEffect
     {
+        [Tooltip("점수를 가져올 가장 높은 점수의 재료 개수")]
+        public int count = 1;
+
         public void Apply(GameContext context)
         {
             if (context.Source == null || context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return;
 
-            RuntimeIngredient highest = null;
-
-            foreach (var current in context.HarvestedIngredients)
+            List<RuntimeIngredient> validIngredients = new List<RuntimeIngredient>();
+            foreach (var item in context.HarvestedIngredients)
             {
-                if (current == null) continue;
-                if (highest == null || current.CurrentScore > highest.CurrentScore)
-                    highest = current;
+                if (item != null)
+                {
+                    validIngredients.Add(item);
+                }
             }
 
-            if (highest != null)
-                context.Source.CurrentScore = highest.CurrentScore;
+            // 점수 내림차순 정렬
+            validIngredients.Sort((a, b) => b.CurrentScore.CompareTo(a.CurrentScore));
+
+            int loopCount = Mathf.Min(count, validIngredients.Count);
+            int totalBonus = 0;
+
+            for (int i = 0; i < loopCount; i++)
+            {
+                totalBonus += validIngredients[i].CurrentScore;
+            }
+
+            context.Source.CurrentScore += totalBonus;
         }
     }
 }

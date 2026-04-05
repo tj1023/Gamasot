@@ -17,10 +17,32 @@ MonoBehaviour:
   type: 2
   rarity: 1
   sprite: {fileID: -7576874432042752839, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
-  synergies: []
+  synergies:
+  - trigger:
+      rid: 8392392052938375251
+    effects:
+    - rid: 8392392052938375253
   isAdvanced: 0
-  advancedBaseScore: 0
-  advancedSynergies: []
+  advancedBaseScore: 30
+  advancedSynergies:
+  - trigger:
+      rid: 8392392052938375277
+    effects:
+    - rid: 8392392052938375278
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 8392392052938375251
+      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      data: 
+    - rid: 8392392052938375253
+      type: {class: AddScoreToAllHarvestedEffect, ns: Architecture, asm: Assembly-CSharp}
+      data:
+        bonusScore: 3
+    - rid: 8392392052938375277
+      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      data: 
+    - rid: 8392392052938375278
+      type: {class: AddScoreToAllHarvestedEffect, ns: Architecture, asm: Assembly-CSharp}
+      data:
+        bonusScore: 6

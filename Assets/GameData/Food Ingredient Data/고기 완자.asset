@@ -17,10 +17,32 @@ MonoBehaviour:
   type: 4
   rarity: 0
   sprite: {fileID: -2432301806248295829, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
-  synergies: []
+  synergies:
+  - trigger:
+      rid: 8392392052938375240
+    effects:
+    - rid: 8392392052938375241
   isAdvanced: 0
-  advancedBaseScore: 0
-  advancedSynergies: []
+  advancedBaseScore: 20
+  advancedSynergies:
+  - trigger:
+      rid: 8392392052938375265
+    effects:
+    - rid: 8392392052938375266
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 8392392052938375240
+      type: {class: OnScoopTrigger, ns: Architecture, asm: Assembly-CSharp}
+      data: 
+    - rid: 8392392052938375241
+      type: {class: AddScoreToScoopedIngredientsEffect, ns: Architecture, asm: Assembly-CSharp}
+      data:
+        bonusScore: 2
+    - rid: 8392392052938375265
+      type: {class: OnScoopTrigger, ns: Architecture, asm: Assembly-CSharp}
+      data: 
+    - rid: 8392392052938375266
+      type: {class: AddScoreToScoopedIngredientsEffect, ns: Architecture, asm: Assembly-CSharp}
+      data:
+        bonusScore: 4
