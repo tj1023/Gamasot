@@ -9,14 +9,17 @@ namespace Architecture
     [Serializable]
     public class AddScoreToRandomEffect : IEffect
     {
+        public int priority = 100;
+        public int Priority => priority;
+        
         [Tooltip("추가할 점수량")]
         public int bonusScore;
         [Tooltip("특정 타입만 추가할 지 여부. None이면 타입 상관없이 추가")]
         public IngredientType targetType = IngredientType.None;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return;
+            if (context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return null;
             
             List<RuntimeIngredient> candidates = new List<RuntimeIngredient>();
             foreach (var item in context.HarvestedIngredients)
@@ -33,8 +36,9 @@ namespace Architecture
             if (candidates.Count > 0)
             {
                 int randomIndex = UnityEngine.Random.Range(0, candidates.Count);
-                candidates[randomIndex].CurrentScore += bonusScore;
+                return new IngredientScoreDeltaCommand(source, candidates[randomIndex], bonusScore);
             }
+            return null;
         }
     }
 
@@ -42,12 +46,14 @@ namespace Architecture
     [Serializable]
     public class AddRandomScoreToSelfEffect : IEffect
     {
+        public int priority = 100;
+        public int Priority => priority;
         [Tooltip("점수를 가져올 랜덤 재료의 개수")]
         public int count = 1;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.Source == null || context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return;
+            if (source == null || context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return null;
 
             List<RuntimeIngredient> validIngredients = new List<RuntimeIngredient>();
             foreach (var item in context.HarvestedIngredients)
@@ -68,7 +74,11 @@ namespace Architecture
                 validIngredients.RemoveAt(randomIndex);
             }
 
-            context.Source.CurrentScore += totalBonus;
+            if (totalBonus > 0)
+            {
+                return new IngredientScoreDeltaCommand(source, source, totalBonus);
+            }
+            return null;
         }
     }
 
@@ -76,18 +86,23 @@ namespace Architecture
     [Serializable]
     public class AddScoreToScoopedIngredientsEffect : IEffect
     {
+        public int priority = 100;
+        public int Priority => priority;
         public int bonusScore;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.LastScooped == null) return;
+            if (context.LastScooped == null || context.LastScooped.Count == 0) return null;
+            
+            List<ICommand> commands = new();
             foreach (var item in context.LastScooped)
             {
                 if (item != null)
                 {
-                    item.CurrentScore += bonusScore;
+                    commands.Add(new IngredientScoreDeltaCommand(source, item, bonusScore, 0f));
                 }
             }
+            return new AggregateCommand(commands);
         }
     }
 
@@ -95,14 +110,17 @@ namespace Architecture
     [Serializable]
     public class MultiplySelfScoreEffect : IEffect
     {
+        public int priority = 200;
+        public int Priority => priority;
         public float multiplier = 2f;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.Source != null)
+            if (source != null)
             {
-                context.Source.CurrentScore = Mathf.RoundToInt(context.Source.CurrentScore * multiplier);
+                return new MultiplyIngredientScoreCommand(source, source, multiplier);
             }
+            return null;
         }
     }
 
@@ -110,22 +128,22 @@ namespace Architecture
     [Serializable]
     public class TransformOtherToAdvancedEffect : IEffect
     {
+        public int priority = 90;
+        public int Priority => priority;
         public float probability = 0.5f;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.Source == null || context.Source.OriginalData == null) return;
+            if (source == null || source.OriginalData == null) return null;
 
-            // 확률 검사
-            if (UnityEngine.Random.value > probability) return;
+            if (UnityEngine.Random.value > probability) return null;
 
-            // 전체(수집된) 재료 중 자신과 이름이 다르고, 아직 고급이 아닌 재료 하나를 찾음
             List<RuntimeIngredient> candidates = new List<RuntimeIngredient>();
             foreach (var item in context.HarvestedIngredients)
             {
                 if (item != null && item.OriginalData != null)
                 {
-                    if (item.OriginalData.ingredientName != context.Source.OriginalData.ingredientName && !item.IsAdvanced)
+                    if (item.OriginalData.ingredientName != source.OriginalData.ingredientName && !item.IsAdvanced)
                     {
                         candidates.Add(item);
                     }
@@ -134,10 +152,10 @@ namespace Architecture
 
             if (candidates.Count > 0)
             {
-                // 랜덤으로 하나 선택
                 int randomIndex = UnityEngine.Random.Range(0, candidates.Count);
-                candidates[randomIndex].TransformToAdvanced();
+                return new TransformIngredientCommand(candidates[randomIndex]);
             }
+            return null;
         }
     }
 
@@ -145,18 +163,25 @@ namespace Architecture
     [Serializable]
     public class AddScoreInPotEffect : IEffect
     {
+        public int priority = 100;
+        public int Priority => priority;
         public IngredientType targetType;
         public int bonusScore;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.PotIngredients == null) return;
+            if (context.PotIngredients == null || context.PotIngredients.Count == 0) return null;
 
+            List<ICommand> commands = new();
             foreach (var item in context.PotIngredients)
             {
                 if (item != null && item.OriginalData != null && item.OriginalData.type == targetType)
-                    item.CurrentScore += bonusScore;
+                {
+                    commands.Add(new IngredientScoreDeltaCommand(source, item, bonusScore, 0f));
+                }
             }
+            if (commands.Count > 0) return new AggregateCommand(commands);
+            return null;
         }
     }
 
@@ -164,14 +189,24 @@ namespace Architecture
     [Serializable]
     public class AddScoreToAllHarvestedEffect : IEffect
     {
+        public int priority = 100;
+        public int Priority => priority;
         public int bonusScore;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.HarvestedIngredients == null) return;
+            if (context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return null;
 
+            List<ICommand> commands = new();
             foreach (var item in context.HarvestedIngredients)
-                if (item != null) item.CurrentScore += bonusScore;
+            {
+                if (item != null) 
+                {
+                    commands.Add(new IngredientScoreDeltaCommand(source, item, bonusScore, 0.2f));
+                }
+            }
+            if (commands.Count > 0) return new AggregateCommand(commands);
+            return null;
         }
     }
 
@@ -179,34 +214,16 @@ namespace Architecture
     [Serializable]
     public class AddHighestScoreToSelfEffect : IEffect
     {
+        public int priority = 300;
+        public int Priority => priority;
         [Tooltip("점수를 가져올 가장 높은 점수의 재료 개수")]
         public int count = 1;
 
-        public void Apply(GameContext context)
+        public ICommand GenerateCommand(GameContext context, RuntimeIngredient source)
         {
-            if (context.Source == null || context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return;
+            if (source == null || context.HarvestedIngredients == null || context.HarvestedIngredients.Count == 0) return null;
 
-            List<RuntimeIngredient> validIngredients = new List<RuntimeIngredient>();
-            foreach (var item in context.HarvestedIngredients)
-            {
-                if (item != null)
-                {
-                    validIngredients.Add(item);
-                }
-            }
-
-            // 점수 내림차순 정렬
-            validIngredients.Sort((a, b) => b.CurrentScore.CompareTo(a.CurrentScore));
-
-            int loopCount = Mathf.Min(count, validIngredients.Count);
-            int totalBonus = 0;
-
-            for (int i = 0; i < loopCount; i++)
-            {
-                totalBonus += validIngredients[i].CurrentScore;
-            }
-
-            context.Source.CurrentScore += totalBonus;
+            return new AddHighestScoreToSelfCommand(context, source, count);
         }
     }
 }

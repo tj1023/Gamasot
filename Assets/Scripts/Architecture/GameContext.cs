@@ -17,11 +17,20 @@ namespace Architecture
     /// </summary>
     public class GameContext
     {
-        // 런타임 동안 모은 점수 (필요 시 전역 점수로 활용)
-        public int GlobalScore { get; set; }
+        // 전역 누적 점수
+        public int TotalScore { get; set; }
+        
+        // 현재 라운드에서 획득한 점수
+        public int RoundScore { get; set; }
 
         public GamePhase CurrentPhase { get; set; }
         
+        // 라운드 및 수집 제한 데이터
+        public int CurrentRound { get; set; } = 1;
+        public int MaxScoopCount { get; set; } = 3;
+        public int RemainScoopCount { get; set; }
+        public float RemainTime { get; set; }
+
         // 현재 이벤트를 발동시킨 주체 재료
         public RuntimeIngredient Source { get; set; }
 

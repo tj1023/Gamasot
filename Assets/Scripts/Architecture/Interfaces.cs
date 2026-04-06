@@ -12,11 +12,21 @@ namespace Architecture
     }
 
     /// <summary>
-    /// 시너지 조건 충족 시 발동될 효과 인터페이스입니다.
+    /// 시너지 조건 충족 시 발동될 효과 (혹은 점수 변형자) 인터페이스입니다.
+    /// 정산 시 파이프라인 정렬을 위해 우선순위(Priority)를 가지며 비동기 커맨드를 생성합니다.
     /// </summary>
     public interface IEffect
     {
-        void Apply(GameContext context);
+        int Priority { get; }
+        ICommand GenerateCommand(GameContext context, Gameplay.RuntimeIngredient source);
+    }
+
+    /// <summary>
+    /// 비동기 실행 가능한 커맨드 (UI 애니메이션 및 딜레이 포함)
+    /// </summary>
+    public interface ICommand
+    {
+        System.Collections.IEnumerator ExecuteAsync();
     }
 
     // --- State Machine ---
@@ -25,11 +35,10 @@ namespace Architecture
     /// FSM 구조에서 사용될 범용 상태 인터페이스입니다.
     /// GC 최소화를 위해 상태를 매번 new 하지 않고 컨텍스트를 주입받아 처리합니다.
     /// </summary>
-    public interface IState<TContext>
+    public interface IState<in TContext>
     {
         void Enter(TContext context);
-        void Update(TContext context);
-        void Exit(TContext context);
+        void Exit();
     }
 
     // --- Event System ---
@@ -37,7 +46,7 @@ namespace Architecture
     /// <summary>
     /// 박싱 없는 EventBus를 위한 리스너 인터페이스.
     /// </summary>
-    public interface IEventListener<TEvent> where TEvent : struct
+    public interface IEventListener<in TEvent> where TEvent : struct
     {
         void OnEvent(TEvent eventData);
     }

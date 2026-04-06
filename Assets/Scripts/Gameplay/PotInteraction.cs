@@ -23,9 +23,6 @@ namespace Gameplay
         private Camera _mainCam;
         private Collider2D[] _overlapResults;
         private ContactFilter2D _ingredientFilter;
-        
-        // 정산을 위해 보관 (추후 GameContext.CurrentIngredients 또는 EventBus로 대체/전달 가능)
-        public List<RuntimeIngredient> HarvestedIngredients { get; private set; } = new();
 
         private void Awake()
         {
@@ -67,9 +64,16 @@ namespace Gameplay
 
             HandleCursorVisual(isInsidePot, worldPos);
 
-            // 솥 안에 있을 때 마우스 클릭 확인
+            // 솥 안에 방금 막 클릭이 발생했을 때
             if (isInsidePot && Mouse.current.leftButton.wasPressedThisFrame)
-                ScoopIngredients(worldPos);
+            {
+                // 게임 매니저(컨텍스트) 체크하여 건지기 허용 상태인지 판별
+                var ctx = GameManager.Instance?.Context;
+                if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0 })
+                {
+                    ScoopIngredients(worldPos);
+                }
+            }
         }
 
         private void HandleCursorVisual(bool isInsidePot, Vector2 worldPos)
@@ -106,14 +110,9 @@ namespace Gameplay
             {
                 IngredientNode node = _overlapResults[i].GetComponent<IngredientNode>();
                 
-                // 오브젝트가 올바른 데이터를 갖고 있는지 필터링
                 if (node != null && node.RuntimeData != null && node.gameObject.activeInHierarchy)
                 {
-                    // 1. 추출한 데이터 이동 (현재는 내부 리스트, 후속 작업 시 GameContext 주입 등)
-                    HarvestedIngredients.Add(node.RuntimeData);
                     newHarvested.Add(node.RuntimeData);
-                    
-                    // 2. 풀로 반환
                     ingredientManager.ReturnToPool(node);
                 }
             }
@@ -132,6 +131,8 @@ namespace Gameplay
 
         private void ApplyScoopSynergies(List<RuntimeIngredient> newlyScooped)
         {
+            var scoopContext = GameManager.Instance.Context;
+
             // 현재 활성화된(솥 안에 있는) 재료들의 RuntimeData 추출
             List<RuntimeIngredient> potIngredients = new List<RuntimeIngredient>(ingredientManager.ActiveIngredients.Count);
             foreach (var node in ingredientManager.ActiveIngredients)
@@ -142,14 +143,8 @@ namespace Gameplay
                 }
             }
 
-            // 시너지를 위한 임시 컨텍스트 생성 (전역 컨텍스트와 동기화 시 구조에 맞게 수정 가능)
-            GameContext scoopContext = new GameContext
-            {
-                CurrentPhase = GamePhase.OnScoop,
-                HarvestedIngredients = this.HarvestedIngredients,
-                LastScooped = newlyScooped,
-                PotIngredients = potIngredients
-            };
+            scoopContext.LastScooped = newlyScooped;
+            scoopContext.PotIngredients = potIngredients;
 
             foreach (var ingredient in newlyScooped)
             {

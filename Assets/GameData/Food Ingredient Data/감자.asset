@@ -38,6 +38,7 @@ MonoBehaviour:
     - rid: 8392392052938375253
       type: {class: AddScoreToAllHarvestedEffect, ns: Architecture, asm: Assembly-CSharp}
       data:
+        priority: 100
         bonusScore: 3
     - rid: 8392392052938375277
       type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
@@ -45,4 +46,5 @@ MonoBehaviour:
     - rid: 8392392052938375278
       type: {class: AddScoreToAllHarvestedEffect, ns: Architecture, asm: Assembly-CSharp}
       data:
+        priority: 100
         bonusScore: 6

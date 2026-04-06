@@ -18,20 +18,10 @@ namespace Architecture
         public void ChangeState(IState<TContext> newState)
         {
             if (_currentState == newState) return;
-
-            // 기존 상태 Exit
-            _currentState?.Exit(_context);
             
-            // 상태 교체
+            _currentState?.Exit();
             _currentState = newState;
-            
-            // 새 상태 Enter
             _currentState?.Enter(_context);
-        }
-
-        public void Update()
-        {
-            _currentState?.Update(_context);
         }
     }
 }

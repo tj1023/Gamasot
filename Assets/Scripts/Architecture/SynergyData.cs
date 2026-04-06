@@ -30,7 +30,18 @@ namespace Architecture
             {
                 foreach (var effect in effects)
                 {
-                    effect?.Apply(context);
+                    if (effect != null)
+                    {
+                        var cmd = effect.GenerateCommand(context, context.Source);
+                        if (cmd != null)
+                        {
+                            var enumerator = cmd.ExecuteAsync();
+                            if (enumerator != null)
+                            {
+                                while (enumerator.MoveNext()) { }
+                            }
+                        }
+                    }
                 }
             }
         }

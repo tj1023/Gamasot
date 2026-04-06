@@ -8,7 +8,7 @@ namespace Gameplay
     /// 음식 재료(IngredientNode)를 솥(PotBoundary) 안으로 생성하고 관리합니다.
     /// ObjectPool을 사용하여 GC 스파이크를 방지합니다.
     /// </summary>
-    public class IngredientManager : MonoBehaviour
+    public class IngredientManager : MonoBehaviour, IEventListener<PhaseChangedEvent>
     {
         [Header("References")]
         [SerializeField] private PotBoundary potBoundary;
@@ -29,6 +29,33 @@ namespace Gameplay
         private void Awake()
         {
             InitializePool();
+        }
+
+        private void OnEnable()
+        {
+            EventBus<PhaseChangedEvent>.Subscribe(this);
+        }
+
+        private void OnDisable()
+        {
+            EventBus<PhaseChangedEvent>.Unsubscribe(this);
+        }
+
+        public void OnEvent(PhaseChangedEvent eventData)
+        {
+            if (eventData.NewPhase == GamePhase.OnScoop)
+            {
+                ClearAll();
+                SpawnTest();
+            }
+        }
+
+        private void ClearAll()
+        {
+            for (int i = ActiveIngredients.Count - 1; i >= 0; i--)
+            {
+                ReturnToPool(ActiveIngredients[i]);
+            }
         }
 
         private void InitializePool()

@@ -9,7 +9,9 @@ namespace UI
     /// <summary>
     /// Scoop 시 발생되는 이벤트를 수신하여 그리드 UI 요소들을 동적으로 생성하고 배치합니다.
     /// </summary>
-    public class ScoopedIngredientUIController : MonoBehaviour, IEventListener<ItemsHarvestedEvent>
+    public class ScoopedIngredientUIController : MonoBehaviour, 
+        IEventListener<ItemsHarvestedEvent>,
+        IEventListener<PhaseChangedEvent>
     {
         [Header("UI References")]
         [SerializeField] private RectTransform gridContainer;
@@ -42,11 +44,21 @@ namespace UI
         private void OnEnable()
         {
             EventBus<ItemsHarvestedEvent>.Subscribe(this);
+            EventBus<PhaseChangedEvent>.Subscribe(this);
         }
 
         private void OnDisable()
         {
             EventBus<ItemsHarvestedEvent>.Unsubscribe(this);
+            EventBus<PhaseChangedEvent>.Unsubscribe(this);
+        }
+
+        public void OnEvent(PhaseChangedEvent eventData)
+        {
+            if (eventData.NewPhase == GamePhase.OnScoop)
+            {
+                ClearAllCells();
+            }
         }
 
         public void OnEvent(ItemsHarvestedEvent eventData)
@@ -88,7 +100,7 @@ namespace UI
         /// <summary>
         /// 추후에 게임 리셋이나 정산이 완료되어 UI를 비워야 할 때 호출합니다.
         /// </summary>
-        public void ClearAllCells()
+        private void ClearAllCells()
         {
             // gridContainer 하위에 활성화된 모든 cell들을 찾아 pool로 반환합니다.
             int childCount = gridContainer.childCount;

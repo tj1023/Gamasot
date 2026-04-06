@@ -38,6 +38,7 @@ MonoBehaviour:
     - rid: 8392392052938375284
       type: {class: AddHighestScoreToSelfEffect, ns: Architecture, asm: Assembly-CSharp}
       data:
+        priority: 300
         count: 1
     - rid: 8392392052938375285
       type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
@@ -45,4 +46,5 @@ MonoBehaviour:
     - rid: 8392392052938375286
       type: {class: AddHighestScoreToSelfEffect, ns: Architecture, asm: Assembly-CSharp}
       data:
+        priority: 300
         count: 2

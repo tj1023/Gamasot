@@ -11,9 +11,6 @@ namespace Architecture
     {
         private static readonly List<IEventListener<TEvent>> Listeners = new(64);
         
-        // 이벤트를 Publish 하는 도중에 구독 취소가 일어날 때를 대비하는 플래그
-        private static bool _isIterating;
-
         public static void Subscribe(IEventListener<TEvent> listener)
         {
             if (!Listeners.Contains(listener))
@@ -29,25 +26,17 @@ namespace Architecture
 
         public static void Publish(TEvent eventData)
         {
-            _isIterating = true;
-            try
+            // 역순 탐색으로 OnEvent 실행 중 구독 해지(Unsubscribe)가 발생하더라도 OutOfRange 에러 회피
+            for (int i = Listeners.Count - 1; i >= 0; i--)
             {
-                // 역순 탐색으로 OnEvent 실행 중 구독 해지(Unsubscribe)가 발생하더라도 OutOfRange 에러 회피
-                for (int i = Listeners.Count - 1; i >= 0; i--)
+                if (Listeners[i] != null)
                 {
-                    if (Listeners[i] != null)
-                    {
-                        Listeners[i].OnEvent(eventData);
-                    }
-                    else
-                    {
-                        Listeners.RemoveAt(i);
-                    }
+                    Listeners[i].OnEvent(eventData);
                 }
-            }
-            finally
-            {
-                _isIterating = false;
+                else
+                {
+                    Listeners.RemoveAt(i);
+                }
             }
         }
 

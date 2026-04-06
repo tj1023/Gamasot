@@ -38,6 +38,7 @@ MonoBehaviour:
     - rid: 8392392052938375241
       type: {class: AddScoreToScoopedIngredientsEffect, ns: Architecture, asm: Assembly-CSharp}
       data:
+        priority: 100
         bonusScore: 2
     - rid: 8392392052938375265
       type: {class: OnScoopTrigger, ns: Architecture, asm: Assembly-CSharp}
@@ -45,4 +46,5 @@ MonoBehaviour:
     - rid: 8392392052938375266
       type: {class: AddScoreToScoopedIngredientsEffect, ns: Architecture, asm: Assembly-CSharp}
       data:
+        priority: 100
         bonusScore: 4
