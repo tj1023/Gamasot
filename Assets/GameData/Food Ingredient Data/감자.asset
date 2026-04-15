@@ -19,7 +19,7 @@ MonoBehaviour:
   sprite: {fileID: -7576874432042752839, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
   synergies:
   - trigger:
-      rid: 8392392052938375251
+      rid: 8392392257364820149
     effects:
     - rid: 8392392052938375253
   isAdvanced: 0
@@ -32,19 +32,25 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 8392392052938375251
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
-      data: 
     - rid: 8392392052938375253
-      type: {class: AddScoreToAllHarvestedEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToGroupEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 100
+        targetList: 0
         bonusScore: 3
+        ingredientFilter: 0
+        delay: 0.2
     - rid: 8392392052938375277
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
     - rid: 8392392052938375278
-      type: {class: AddScoreToAllHarvestedEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToGroupEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 100
+        targetList: 0
         bonusScore: 6
+        ingredientFilter: 0
+        delay: 0.2
+    - rid: 8392392257364820149
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
+      data: 

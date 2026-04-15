@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
-using Architecture;
 using UnityEditor;
 using UnityEngine;
+
+using Core;
 
 namespace Editor
 {
@@ -68,10 +69,11 @@ namespace Editor
             {
                 property.managedReferenceValue = newIndex == 0 ? null : Activator.CreateInstance(derivedTypes[newIndex - 1]);
                 property.serializedObject.ApplyModifiedProperties();
+                // Removed unsafe Update() and Event.current.Use() which cause invalid GC handle
             }
 
             // 내부 필드(수치 입력 등) 렌더링
-            if (property.isExpanded && currentType != null)
+            if (property.isExpanded && currentType != null && property.hasVisibleChildren)
             {
                 EditorGUI.indentLevel++;
                 Rect propertyRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
@@ -83,8 +85,8 @@ namespace Editor
                 {
                     enterChildren = false;
 
-                    // 현재 객체의 끝에 도달하면 반복 종료
-                    if (SerializedProperty.EqualContents(iterator, property.GetEndProperty()))
+                    // 부모 프로퍼티 경로와 다르면 자식이 아님
+                    if (!iterator.propertyPath.StartsWith(property.propertyPath + "."))
                         break;
 
                     float childHeight = EditorGUI.GetPropertyHeight(iterator, true);
@@ -102,15 +104,17 @@ namespace Editor
         {
             float height = EditorGUIUtility.singleLineHeight;
             
-            if (property.isExpanded && !string.IsNullOrEmpty(property.managedReferenceFullTypename))
+            if (property.isExpanded && !string.IsNullOrEmpty(property.managedReferenceFullTypename) && property.hasVisibleChildren)
             {
                 SerializedProperty iterator = property.Copy();
                 bool enterChildren = true;
                 while (iterator.NextVisible(enterChildren))
                 {
                     enterChildren = false;
-                    if (SerializedProperty.EqualContents(iterator, property.GetEndProperty()))
+                    
+                    if (!iterator.propertyPath.StartsWith(property.propertyPath + "."))
                         break;
+                        
                     height += EditorGUI.GetPropertyHeight(iterator, true) + EditorGUIUtility.standardVerticalSpacing;
                 }
             }

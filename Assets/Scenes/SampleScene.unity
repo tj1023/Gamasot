@@ -1275,7 +1275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d191e42c0028954b87cb0c3e8df5de0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.ScoopedIngredientUIController
-  gridContainer: {fileID: 1407639767}
+  container: {fileID: 1407639767}
   cellPrefab: {fileID: 1066607425784948463, guid: 57f3315a8cb5d6048b2014c763282b43, type: 3}
   spawnDelay: 0.1
 --- !u!1 &1102805687
@@ -1614,9 +1614,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ee667cba39f284e98932e2b980c8cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.ScoreUIRegistry
-  roundScoreTextRect: {fileID: 174570053}
-  totalScoreTextRect: {fileID: 174570053}
-  mainCanvas: {fileID: 295261867}
+  totalScoreRect: {fileID: 0}
 --- !u!114 &1450446216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1630,7 +1628,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.ScoreTrailEffectManager
   trailPrefab: {fileID: 6117588374584334886, guid: d2ddb0025a42c7a48bc891a5d952749f, type: 3}
-  movementCurve:
+  curve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3

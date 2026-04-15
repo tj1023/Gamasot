@@ -33,18 +33,20 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 8392392052938375244
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
     - rid: 8392392052938375245
-      type: {class: AddScoreToRandomEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToRandomEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
+        priority: 100
         bonusScore: 10
-        targetType: 1
+        ingredientFilter: 1
     - rid: 8392392052938375269
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
     - rid: 8392392052938375270
-      type: {class: AddScoreToRandomEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToRandomEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
+        priority: 100
         bonusScore: 20
-        targetType: 1
+        ingredientFilter: 1

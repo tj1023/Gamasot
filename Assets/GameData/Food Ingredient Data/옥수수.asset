@@ -32,17 +32,17 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 8392392052938375242
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
-      data: 
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
     - rid: 8392392052938375243
-      type: {class: MultiplySelfScoreEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: MultiplyScoreEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         multiplier: 2
     - rid: 8392392052938375267
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
-      data: 
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
     - rid: 8392392052938375268
-      type: {class: MultiplySelfScoreEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: MultiplyScoreEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         multiplier: 3

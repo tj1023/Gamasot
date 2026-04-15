@@ -32,19 +32,19 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 8392392052938375168
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
-      data: 
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
     - rid: 8392392052938375237
-      type: {class: AddScoreToRandomEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToRandomEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         bonusScore: 10
         targetType: 0
     - rid: 8392392052938375260
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
-      data: 
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
     - rid: 8392392052938375261
-      type: {class: AddScoreToRandomEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToRandomEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         bonusScore: 20
         targetType: 0

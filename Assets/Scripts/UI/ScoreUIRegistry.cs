@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Gameplay;
+using Data;
 
 namespace UI
 {
@@ -12,13 +12,10 @@ namespace UI
     {
         public static ScoreUIRegistry Instance { get; private set; }
 
-        private readonly Dictionary<RuntimeIngredient, RectTransform> _ingredientUIMap = new();
+        private readonly Dictionary<RuntimeIngredient, RectTransform> _cells = new();
         
         [Header("Global Score Texts")]
-        [SerializeField] private RectTransform totalScoreTextRect;
-
-        [Header("Canvas Reference")]
-        [SerializeField] private Canvas mainCanvas;
+        [SerializeField] private RectTransform totalScoreRect;
 
         private void Awake()
         {
@@ -32,16 +29,16 @@ namespace UI
             }
         }
 
-        public void RegisterGlobalTexts(RectTransform roundScore, RectTransform totalScore)
+        public void RegisterTotalScore(RectTransform totalScore)
         {
-           totalScoreTextRect = totalScore;
+           totalScoreRect = totalScore;
         }
 
         public void RegisterIngredient(RuntimeIngredient ingredient, RectTransform rectTransform)
         {
             if (ingredient != null && rectTransform != null)
             {
-                _ingredientUIMap[ingredient] = rectTransform;
+                _cells[ingredient] = rectTransform;
             }
         }
 
@@ -49,7 +46,7 @@ namespace UI
         {
             if (ingredient != null)
             {
-                _ingredientUIMap.Remove(ingredient);
+                _cells.Remove(ingredient);
             }
         }
 
@@ -63,7 +60,7 @@ namespace UI
 
         public bool TryGetIngredientPosition(RuntimeIngredient ingredient, out Vector3 position)
         {
-            if (ingredient != null && _ingredientUIMap.TryGetValue(ingredient, out var rect))
+            if (ingredient != null && _cells.TryGetValue(ingredient, out var rect))
             {
                 position = GetWorldPosition(rect);
                 return true;
@@ -74,9 +71,9 @@ namespace UI
 
         public bool TryGetTotalScorePosition(out Vector3 position)
         {
-            if (totalScoreTextRect != null)
+            if (totalScoreRect != null)
             {
-                position = GetWorldPosition(totalScoreTextRect);
+                position = GetWorldPosition(totalScoreRect);
                 return true;
             }
             position = Vector3.zero;

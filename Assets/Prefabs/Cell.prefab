@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c50bdf495308f3747aa07adfcd81cbd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.ScoopedIngredientGridCellUI
-  ingredientIcon: {fileID: 5460391387784997738}
+  icon: {fileID: 5460391387784997738}
   scoreText: {fileID: 8374545198967373361}
 --- !u!1 &6054292828973954704
 GameObject:

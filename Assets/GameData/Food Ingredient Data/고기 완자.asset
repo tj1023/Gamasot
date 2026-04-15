@@ -33,18 +33,24 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 8392392052938375240
-      type: {class: OnScoopTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnScoopTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
     - rid: 8392392052938375241
-      type: {class: AddScoreToScoopedIngredientsEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToGroupEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 100
+        targetList: 2
         bonusScore: 2
+        ingredientFilter: 0
+        delay: 0
     - rid: 8392392052938375265
-      type: {class: OnScoopTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnScoopTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
     - rid: 8392392052938375266
-      type: {class: AddScoreToScoopedIngredientsEffect, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: BonusToGroupEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 100
+        targetList: 2
         bonusScore: 4
+        ingredientFilter: 0
+        delay: 0

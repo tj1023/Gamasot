@@ -21,28 +21,30 @@ MonoBehaviour:
   - trigger:
       rid: 8392392052938375238
     effects:
-    - rid: 8392392052938375239
+    - rid: 8392392277963046997
   isAdvanced: 0
   advancedBaseScore: 10
   advancedSynergies:
   - trigger:
       rid: 8392392052938375262
     effects:
-    - rid: 8392392052938375264
+    - rid: 8392392277963046998
   references:
     version: 2
     RefIds:
     - rid: 8392392052938375238
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
-    - rid: 8392392052938375239
-      type: {class: AddRandomScoreToSelfEffect, ns: Architecture, asm: Assembly-CSharp}
-      data:
-        count: 1
     - rid: 8392392052938375262
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
-    - rid: 8392392052938375264
-      type: {class: AddRandomScoreToSelfEffect, ns: Architecture, asm: Assembly-CSharp}
+    - rid: 8392392277963046997
+      type: {class: CollectRandomScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
-        count: 2
+        priority: 300
+        pickCount: 1
+    - rid: 8392392277963046998
+      type: {class: CollectRandomScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
+      data:
+        priority: 300
+        pickCount: 2

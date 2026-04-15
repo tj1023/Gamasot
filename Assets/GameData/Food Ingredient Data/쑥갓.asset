@@ -19,30 +19,32 @@ MonoBehaviour:
   sprite: {fileID: -4074711270985794095, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
   synergies:
   - trigger:
-      rid: 8392392052938375246
+      rid: 8392392276041007195
     effects:
-    - rid: 8392392052938375248
+    - rid: 8392392276041007196
   isAdvanced: 0
   advancedBaseScore: 30
   advancedSynergies:
   - trigger:
-      rid: 8392392052938375271
+      rid: 8392392276041007197
     effects:
-    - rid: 8392392052938375272
+    - rid: 8392392276041007198
   references:
     version: 2
     RefIds:
-    - rid: 8392392052938375246
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+    - rid: 8392392276041007195
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
-    - rid: 8392392052938375248
-      type: {class: TransformOtherToAdvancedEffect, ns: Architecture, asm: Assembly-CSharp}
+    - rid: 8392392276041007196
+      type: {class: UpgradeRandomEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
+        priority: 90
         probability: 0.5
-    - rid: 8392392052938375271
-      type: {class: OnSettlementTrigger, ns: Architecture, asm: Assembly-CSharp}
+    - rid: 8392392276041007197
+      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
-    - rid: 8392392052938375272
-      type: {class: TransformOtherToAdvancedEffect, ns: Architecture, asm: Assembly-CSharp}
+    - rid: 8392392276041007198
+      type: {class: UpgradeRandomEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
+        priority: 90
         probability: 1
