@@ -82,10 +82,12 @@ namespace Gameplay.Systems
 
         public void OnEvent(IngredientSelectedEvent evt)
         {
-            if (evt.SelectedData == null) return;
+            if (evt.SelectedData != null)
+            {
+                // 선택된 재료를 컨텍스트에 추가
+                Context.SelectedIngredients.Add(evt.SelectedData);
+            }
 
-            // 선택된 재료를 컨텍스트에 추가
-            Context.SelectedIngredients.Add(evt.SelectedData);
             Context.RemainSelectionCount--;
 
             if (Context.RemainSelectionCount <= 0)
