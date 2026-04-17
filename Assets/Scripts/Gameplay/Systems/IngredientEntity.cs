@@ -13,6 +13,10 @@ namespace Gameplay.Systems
         [Header("Movement Settings")]
         [SerializeField] private float minSpeed = 1f;
         [SerializeField] private float maxSpeed = 3f;
+
+        [Header("Rotation Settings")]
+        [SerializeField] private float minRotationSpeed = 20f;
+        [SerializeField] private float maxRotationSpeed = 120f;
         
         private Rigidbody2D _rb;
         private SpriteRenderer _spriteRenderer;
@@ -43,6 +47,10 @@ namespace Gameplay.Systems
             Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
             float randomSpeed = UnityEngine.Random.Range(minSpeed, maxSpeed);
             _rb.linearVelocity = randomDir * randomSpeed;
+
+            // 자연스러운 초기 회전 속도 부여
+            float randomRot = UnityEngine.Random.Range(minRotationSpeed, maxRotationSpeed);
+            _rb.angularVelocity = UnityEngine.Random.value > 0.5f ? randomRot : -randomRot;
         }
 
         /// <summary>
@@ -63,6 +71,19 @@ namespace Gameplay.Systems
             else if (currentSpeed > maxSpeed)
             {
                 _rb.linearVelocity = _rb.linearVelocity.normalized * maxSpeed;
+            }
+
+            // 충돌 등으로 인해 회전이 멈추거나 너무 빨라지는 것을 방지하여 자연스러운 회전 유지
+            float currentAngularSpeed = Mathf.Abs(_rb.angularVelocity);
+            if (currentAngularSpeed < minRotationSpeed)
+            {
+                float sign = _rb.angularVelocity >= 0f ? 1f : -1f;
+                _rb.angularVelocity = sign * minRotationSpeed;
+            }
+            else if (currentAngularSpeed > maxRotationSpeed)
+            {
+                float sign = _rb.angularVelocity >= 0f ? 1f : -1f;
+                _rb.angularVelocity = sign * maxRotationSpeed;
             }
         }
 

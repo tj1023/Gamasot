@@ -171,3 +171,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gameplay.IngredientNode
   minSpeed: 0.1
   maxSpeed: 0.5
+  minRotationSpeed: 1
+  maxRotationSpeed: 20

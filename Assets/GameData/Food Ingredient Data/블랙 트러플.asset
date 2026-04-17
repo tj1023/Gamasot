@@ -17,6 +17,8 @@ MonoBehaviour:
   type: 3
   rarity: 2
   sprite: {fileID: -5145311920877871996, guid: 2c4e386772cb36445b9fffb662f8d0af, type: 3}
+  count: 2
+  desc: 
   synergies:
   - trigger:
       rid: 8392392052938375256
