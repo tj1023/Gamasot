@@ -13,7 +13,8 @@ namespace Gameplay.Systems
         IEventListener<RequestPhaseChangeEvent>, 
         IEventListener<ItemsHarvestedEvent>,
         IEventListener<IngredientSelectedEvent>,
-        IEventListener<GamePausedEvent>
+        IEventListener<GamePausedEvent>,
+        IEventListener<ExcessDeletedEvent>
     {
         public static GameManager Instance { get; private set; }
 
@@ -49,6 +50,7 @@ namespace Gameplay.Systems
             EventBus<ItemsHarvestedEvent>.Subscribe(this);
             EventBus<IngredientSelectedEvent>.Subscribe(this);
             EventBus<GamePausedEvent>.Subscribe(this);
+            EventBus<ExcessDeletedEvent>.Subscribe(this);
 
             // 초기 상태: 재료 선택부터 시작
             _stateMachine.ChangeState(_selectionState);
@@ -65,6 +67,7 @@ namespace Gameplay.Systems
             EventBus<ItemsHarvestedEvent>.Unsubscribe(this);
             EventBus<IngredientSelectedEvent>.Unsubscribe(this);
             EventBus<GamePausedEvent>.Unsubscribe(this);
+            EventBus<ExcessDeletedEvent>.Unsubscribe(this);
         }
 
         public void OnEvent(GamePausedEvent evt)
@@ -99,6 +102,27 @@ namespace Gameplay.Systems
 
             Context.RemainSelectionCount--;
 
+            if (Context.RemainSelectionCount <= 0)
+            {
+                // 모든 선택이 끝난 후에 초과분 확인
+                if (Context.SelectedIngredients.Count > Context.MaxSelectedIngredients)
+                {
+                    int excessCount = Context.SelectedIngredients.Count - Context.MaxSelectedIngredients;
+                    EventBus<RequestDeleteExcessEvent>.Publish(new RequestDeleteExcessEvent { ExcessCount = excessCount });
+                    return;
+                }
+            }
+
+            ProceedAfterSelection();
+        }
+
+        public void OnEvent(ExcessDeletedEvent evt)
+        {
+            ProceedAfterSelection();
+        }
+
+        private void ProceedAfterSelection()
+        {
             if (Context.RemainSelectionCount <= 0)
             {
                 // 선택 완료 → OnScoop 페이즈로 전환

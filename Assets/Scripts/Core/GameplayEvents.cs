@@ -50,6 +50,15 @@ namespace Core
         public FoodIngredientData SelectedData;
     }
 
+    public struct RequestDeleteExcessEvent
+    {
+        public int ExcessCount;
+    }
+
+    public struct ExcessDeletedEvent
+    {
+    }
+
     public struct TimerUpdatedEvent
     {
         public float RemainTime;

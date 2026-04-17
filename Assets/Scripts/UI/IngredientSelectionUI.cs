@@ -12,7 +12,9 @@ namespace UI
     /// 플레이어가 클릭하면 선택 이벤트를 발행합니다.
     /// 카드는 미리 생성해두고 활성화/비활성화로 관리합니다.
     /// </summary>
-    public class IngredientSelectionUI : MonoBehaviour, IEventListener<PhaseChangedEvent>
+    public class IngredientSelectionUI : MonoBehaviour, 
+        IEventListener<PhaseChangedEvent>,
+        IEventListener<RequestDeleteExcessEvent>
     {
         [Header("UI References")]
         [SerializeField] private GameObject rootPanel;
@@ -71,11 +73,13 @@ namespace UI
         private void OnEnable()
         {
             EventBus<PhaseChangedEvent>.Subscribe(this);
+            EventBus<RequestDeleteExcessEvent>.Subscribe(this);
         }
 
         private void OnDisable()
         {
             EventBus<PhaseChangedEvent>.Unsubscribe(this);
+            EventBus<RequestDeleteExcessEvent>.Unsubscribe(this);
         }
 
         public void OnEvent(PhaseChangedEvent eventData)
@@ -90,6 +94,11 @@ namespace UI
                     HideCandidates();
                     break;
             }
+        }
+
+        public void OnEvent(RequestDeleteExcessEvent eventData)
+        {
+            HideCandidates();
         }
 
         private void ShowCandidates()

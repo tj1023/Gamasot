@@ -30,6 +30,7 @@ namespace Data
         public int MaxScoopCount { get; set; } = 3;
         public int RemainScoopCount { get; set; }
         public int RemainSelectionCount { get; set; }
+        public int MaxSelectedIngredients { get; set; } = 7;
         public float RemainTime { get; set; }
         
         // 게임 일시정지 상태
