@@ -85,10 +85,22 @@ namespace UI
 
         private IEnumerator SpawnRoutine(List<RuntimeIngredient> items)
         {
-            foreach (var t in items)
+            // ListPool을 사용하여 GC 할당을 방지합니다.
+            var itemsCopy = ListPool<RuntimeIngredient>.Get();
+            itemsCopy.AddRange(items);
+
+            try
             {
-                AddCell(t);
-                yield return WaitCache.Seconds(spawnDelay);
+                foreach (var t in itemsCopy)
+                {
+                    AddCell(t);
+                    yield return WaitCache.Seconds(spawnDelay);
+                }
+            }
+            finally
+            {
+                // 코루틴이 종료되거나 도중에 중단되더라도 리스트를 확실하게 반환합니다.
+                ListPool<RuntimeIngredient>.Release(itemsCopy);
             }
         }
 
