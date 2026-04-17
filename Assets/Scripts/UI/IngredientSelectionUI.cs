@@ -15,12 +15,11 @@ namespace UI
     public class IngredientSelectionUI : MonoBehaviour, IEventListener<PhaseChangedEvent>
     {
         [Header("UI References")]
+        [SerializeField] private GameObject rootPanel;
         [SerializeField] private RectTransform container;
         [SerializeField] private IngredientInfoUI infoPrefab;
-        [SerializeField, Tooltip("주변을 어둡게 할 배경 이미지")]
-        private GameObject darkBackground;
-        [SerializeField, Tooltip("미선택(건너뛰기) 버튼")]
-        private Button skipButton;
+        [SerializeField] private GameObject darkBackground;
+        [SerializeField] private Button skipButton;
 
         [Header("Selection Settings")]
         [SerializeField, Tooltip("한 번에 표시할 후보 재료 수")]
@@ -95,12 +94,9 @@ namespace UI
 
         private void ShowCandidates()
         {
-            HideCandidates();
-
             if (ingredientPool == null || ingredientPool.Length == 0) return;
 
-            if (darkBackground != null) darkBackground.SetActive(true);
-            if (skipButton != null) skipButton.gameObject.SetActive(true);
+            if(rootPanel != null) rootPanel.SetActive(true);
 
             // Fisher-Yates 부분 셔플로 중복 없는 무작위 후보 선택 (GC 할당 최소화)
             int count = Mathf.Min(candidateCount, ingredientPool.Length);
@@ -128,25 +124,24 @@ namespace UI
 
         private void HideCandidates()
         {
-            if (darkBackground != null) darkBackground.SetActive(false);
-            if (skipButton != null) skipButton.gameObject.SetActive(false);
+            if(rootPanel != null) rootPanel.SetActive(false);
 
             if (_cards == null) return;
 
-            for (int i = 0; i < _cards.Length; i++)
+            foreach (var t in _cards)
             {
-                _cards[i].OnSelected = null;
-                _cards[i].gameObject.SetActive(false);
+                t.OnSelected = null;
+                t.gameObject.SetActive(false);
             }
         }
 
-        private void OnSkipButtonClicked()
+        private static void OnSkipButtonClicked()
         {
             // 선택을 건너뛰는 경우 null을 전달합니다.
             OnIngredientSelected(null);
         }
 
-        private void OnIngredientSelected(FoodIngredientData data)
+        private static void OnIngredientSelected(FoodIngredientData data)
         {
             EventBus<IngredientSelectedEvent>.Publish(new IngredientSelectedEvent
             {
