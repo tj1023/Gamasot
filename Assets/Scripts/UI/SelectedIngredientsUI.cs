@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,7 +52,9 @@ namespace UI
         {
             if (eventData.SelectedData != null)
             {
-                AddIngredient(eventData.SelectedData);
+                // 실시간으로 항목이 추가될 때, 순서 보장을 위해 전체를 다시 그립니다.
+                // 굳이 AddIngredient로 맨 끝에 붙이지 않고 갱신합니다.
+                RefreshUI();
             }
         }
 
@@ -88,7 +91,7 @@ namespace UI
         }
 
         /// <summary>
-        /// Context에 저장된 현재 선택된 재료 리스트를 기반으로 UI를 초기화합니다.
+        /// Context에 저장된 현재 선택된 재료 리스트를 정렬하여 UI를 초기화합니다.
         /// </summary>
         private void RefreshUI()
         {
@@ -103,7 +106,13 @@ namespace UI
             var context = Gameplay.Systems.GameManager.Instance?.Context;
             if (context is { SelectedIngredients: not null })
             {
-                foreach (var data in context.SelectedIngredients)
+                // UI 표현을 위해 정렬: 희귀도 내림차순 -> 타입 오름차순 -> 이름 오름차순
+                var sortedIngredients = context.SelectedIngredients
+                    .OrderBy(data => data.rarity)
+                    .ThenBy(data => data.type)
+                    .ThenBy(data => data.ingredientName);
+
+                foreach (var data in sortedIngredients)
                 {
                     AddIngredient(data);
                 }
@@ -122,10 +131,6 @@ namespace UI
             }
 
             _spawnedItems.Add(ui);
-            
-            // 항목이 추가될 때 오른쪽 끝으로 스크롤을 이동하고 싶다면 아래 코드를 활성화
-            // if (scrollRect != null) Canvas.ForceUpdateCanvases();
-            // if (scrollRect != null) scrollRect.horizontalNormalizedPosition = 1f;
         }
     }
 }
