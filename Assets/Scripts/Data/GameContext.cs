@@ -5,6 +5,7 @@ namespace Data
     public enum GamePhase
     {
         None,
+        OnSelection,
         OnScoop,
         OnSettlement
     }
@@ -28,6 +29,7 @@ namespace Data
         public int CurrentRound { get; set; } = 1;
         public int MaxScoopCount { get; set; } = 3;
         public int RemainScoopCount { get; set; }
+        public int RemainSelectionCount { get; set; }
         public float RemainTime { get; set; }
 
         // 현재 이벤트를 발동시킨 주체 재료
@@ -38,6 +40,9 @@ namespace Data
 
         // 방금 막 건져진 재료 목록 (건질 때 사용할 임시 리스트)
         public List<RuntimeIngredient> LastScooped { get; } = new();
+
+        // 라운드 시작 전 플레이어가 선택한 재료 데이터 목록
+        public List<FoodIngredientData> SelectedIngredients { get; } = new();
 
         // 아직 냄비 안에 남아있는 재료 목록 
         // (실제 게임에서는 IngredientManager 등을 통해 갱신해야 함)

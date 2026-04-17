@@ -66,13 +66,15 @@ namespace Gameplay.Systems
             float distToPotCenter = Vector2.Distance(worldPos, potBoundary.transform.position);
             bool isInsidePot = distToPotCenter <= potBoundary.Radius;
 
-            HandleCursorVisual(isInsidePot, worldPos);
+            var ctx = GameManager.Instance?.Context;
+            bool isScoopPhase = ctx != null && ctx.CurrentPhase == GamePhase.OnScoop;
+
+            HandleCursorVisual(isInsidePot && isScoopPhase, worldPos);
 
             // 솥 안에 방금 막 클릭이 발생했을 때
             if (isInsidePot && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 // 게임 매니저(컨텍스트) 체크하여 건지기 허용 상태인지 판별
-                var ctx = GameManager.Instance?.Context;
                 if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0 })
                 {
                     ScoopIngredients(worldPos);

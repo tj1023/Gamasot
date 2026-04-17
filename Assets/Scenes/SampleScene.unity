@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 165914190}
   - component: {fileID: 165914191}
   m_Layer: 5
-  m_Name: Game Info UI Controller
+  m_Name: Game Info UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -409,6 +409,7 @@ RectTransform:
   m_Children:
   - {fileID: 165914190}
   - {fileID: 1079486294}
+  - {fileID: 1080068136}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -476,7 +477,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3389094178996165871, guid: f5f755ab758d77f46910f9c58c635f5c, type: 3}
+  m_Sprite: {fileID: -1198477067713850731, guid: ad15609f86f3a9943a95f773ea620ec4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1229,7 +1230,7 @@ GameObject:
   - component: {fileID: 1079486296}
   - component: {fileID: 1079486295}
   m_Layer: 5
-  m_Name: Ingredient UI
+  m_Name: Ingredient Grid UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1278,6 +1279,97 @@ MonoBehaviour:
   container: {fileID: 1407639767}
   cellPrefab: {fileID: 1066607425784948463, guid: 57f3315a8cb5d6048b2014c763282b43, type: 3}
   spawnDelay: 0.1
+--- !u!1 &1080068135
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1080068136}
+  - component: {fileID: 1080068138}
+  - component: {fileID: 1080068137}
+  m_Layer: 5
+  m_Name: Ingredient Selection UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1080068136
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1080068135}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 295261868}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.3}
+  m_AnchorMax: {x: 1, y: 0.7}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1080068137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1080068135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 20
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &1080068138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1080068135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 662d506788debea44ac223dbf08d2898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.IngredientSelectionUI
+  container: {fileID: 1080068136}
+  infoPrefab: {fileID: 2848824956568211084, guid: 65b4d7d297a580d45a6c53e9e4384761, type: 3}
+  candidateCount: 3
+  ingredientPool:
+  - {fileID: 11400000, guid: 6bc909f9b063078438b18fc7529e5e80, type: 2}
+  - {fileID: 11400000, guid: ec7cdbaf73630f44fb98cc55a77ecfa4, type: 2}
+  - {fileID: 11400000, guid: 6477a579fcb7d1a42a90b902f9090027, type: 2}
+  - {fileID: 11400000, guid: c655f291f7f19f749b1e6db2d0415a97, type: 2}
+  - {fileID: 11400000, guid: 567cc2d9a5c72534c98ef0a079265303, type: 2}
+  - {fileID: 11400000, guid: 2620b465fe45a024793ff727417025df, type: 2}
+  - {fileID: 11400000, guid: 30171461991e9334f8bf192c3bcc93fa, type: 2}
+  - {fileID: 11400000, guid: f7bc5ce26364935449d1f15542e03d3b, type: 2}
+  - {fileID: 11400000, guid: fffe3ee359ec5f44c97bf8c0ed9d4ee9, type: 2}
+  - {fileID: 11400000, guid: 7a6b10019a181f34596e0494778eb48a, type: 2}
+  - {fileID: 11400000, guid: b0b26680aadfceb4f8a660a5d1857291, type: 2}
+  - {fileID: 11400000, guid: fcf9d6fd332778c43b03e21c8a1c3941, type: 2}
 --- !u!1 &1102805687
 GameObject:
   m_ObjectHideFlags: 0
@@ -1314,17 +1406,6 @@ MonoBehaviour:
   ingredientPrefab: {fileID: 2391996878875615464, guid: 1e05ef57c8daf434282d5d364e961de0, type: 3}
   defaultCapacity: 20
   maxSize: 100
-  testIngredients:
-  - {fileID: 11400000, guid: 6bc909f9b063078438b18fc7529e5e80, type: 2}
-  - {fileID: 11400000, guid: ec7cdbaf73630f44fb98cc55a77ecfa4, type: 2}
-  - {fileID: 11400000, guid: 6477a579fcb7d1a42a90b902f9090027, type: 2}
-  - {fileID: 11400000, guid: 567cc2d9a5c72534c98ef0a079265303, type: 2}
-  - {fileID: 11400000, guid: 2620b465fe45a024793ff727417025df, type: 2}
-  - {fileID: 11400000, guid: f7bc5ce26364935449d1f15542e03d3b, type: 2}
-  - {fileID: 11400000, guid: fffe3ee359ec5f44c97bf8c0ed9d4ee9, type: 2}
-  - {fileID: 11400000, guid: 7a6b10019a181f34596e0494778eb48a, type: 2}
-  - {fileID: 11400000, guid: b0b26680aadfceb4f8a660a5d1857291, type: 2}
-  - {fileID: 11400000, guid: fcf9d6fd332778c43b03e21c8a1c3941, type: 2}
 --- !u!114 &1102805689
 MonoBehaviour:
   m_ObjectHideFlags: 0

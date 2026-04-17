@@ -32,6 +32,8 @@ namespace Data
         public IngredientType type;
         public Rarity rarity;
         public Sprite sprite;
+        public int count = 4;
+        [TextArea(2, 5)] public string desc;
 
         [Header("시너지 시스템")]
         [Tooltip("고유 시너지 규칙 (트리거+이펙트를 리스트로 조합)")]

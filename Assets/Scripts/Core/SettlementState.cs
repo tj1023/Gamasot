@@ -116,7 +116,7 @@ namespace Core
             context.CurrentRound++;
             context.HarvestedIngredients.Clear();
 
-            EventBus<RequestPhaseChangeEvent>.Publish(new RequestPhaseChangeEvent { TargetPhase = GamePhase.OnScoop });
+            EventBus<RequestPhaseChangeEvent>.Publish(new RequestPhaseChangeEvent { TargetPhase = GamePhase.OnSelection });
         }
     }
 

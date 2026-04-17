@@ -17,6 +17,8 @@ MonoBehaviour:
   type: 3
   rarity: 0
   sprite: {fileID: -3695297196475942453, guid: 2c4e386772cb36445b9fffb662f8d0af, type: 3}
+  count: 4
+  desc: 
   synergies:
   - trigger:
       rid: 8392392052938375238
@@ -41,10 +43,10 @@ MonoBehaviour:
     - rid: 8392392277963046997
       type: {class: CollectRandomScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
-        priority: 300
+        priority: 250
         pickCount: 1
     - rid: 8392392277963046998
       type: {class: CollectRandomScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
-        priority: 300
+        priority: 250
         pickCount: 2

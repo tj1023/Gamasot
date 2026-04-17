@@ -17,10 +17,7 @@ namespace Gameplay.Synergies
         {
             if (source == null) return null;
 
-            int scoreDelta = Mathf.RoundToInt(source.CurrentScore * multiplier) - source.CurrentScore;
-            if (scoreDelta == 0) return null;
-
-            return new AddScoreCommand(source, source, scoreDelta);
+            return new MultiplyScoreCommand(source, source, multiplier);
         }
     }
 }

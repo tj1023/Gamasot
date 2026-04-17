@@ -21,9 +21,6 @@ namespace Gameplay.Systems
         [SerializeField] private int defaultCapacity = 20;
         [SerializeField] private int maxSize = 100;
         
-        [Header("Test")]
-        [SerializeField] private FoodIngredientData[] testIngredients;
-        
         private ObjectPool<IngredientEntity> _ingredientPool;
         
         // 현재 솥(Pot)에 존재하는 활성화된 재료 노드 리스트
@@ -46,10 +43,34 @@ namespace Gameplay.Systems
 
         public void OnEvent(PhaseChangedEvent eventData)
         {
-            if (eventData.NewPhase == GamePhase.OnScoop)
+            switch (eventData.NewPhase)
             {
-                ClearAll();
-                SpawnTest();
+                case GamePhase.OnSelection:
+                    ClearAll();
+                    break;
+                case GamePhase.OnScoop:
+                    SpawnSelected();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// GameContext.SelectedIngredients에 담긴 재료를 각각의 count만큼 스폰합니다.
+        /// </summary>
+        private void SpawnSelected()
+        {
+            var context = GameManager.Instance.Context;
+            if (context.SelectedIngredients == null || context.SelectedIngredients.Count == 0) return;
+
+            foreach (var data in context.SelectedIngredients)
+            {
+                if (data == null) continue;
+                
+                int spawnCount = Mathf.Max(1, data.count);
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    SpawnIngredient(data);
+                }
             }
         }
 
@@ -97,17 +118,15 @@ namespace Gameplay.Systems
         /// <summary>
         /// 풀에서 오브젝트를 꺼내와서 원형 공간 안에 무작위 위치로 스폰합니다.
         /// </summary>
-        public IngredientEntity SpawnIngredient(FoodIngredientData data)
+        private void SpawnIngredient(FoodIngredientData data)
         {
-            IngredientEntity node = _ingredientPool.Get();
+            IngredientEntity ingredient = _ingredientPool.Get();
             
             // 원형 경계의 가장자리에 끼이지 않도록 반지름의 80~90% 내에만 스폰 되게 처리.
             Vector2 randomPoint = Random.insideUnitCircle * (potBoundary.Radius * 0.8f);
             
-            node.transform.position = potBoundary.transform.position + (Vector3)randomPoint;
-            node.Initialize(data);
-            
-            return node;
+            ingredient.transform.position = potBoundary.transform.position + (Vector3)randomPoint;
+            ingredient.Initialize(data);
         }
 
         /// <summary>
@@ -116,14 +135,6 @@ namespace Gameplay.Systems
         public void ReturnToPool(IngredientEntity node)
         {
             _ingredientPool.Release(node);
-        }
-
-        // 테스트용 유틸리티 (에디터 내에서 호출 테스트용)
-        [ContextMenu("Spawn Dummy Ingredient")]
-        private void SpawnTest()
-        {
-            foreach (var t in testIngredients)
-                SpawnIngredient(t);
         }
     }
 }

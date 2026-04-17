@@ -45,6 +45,11 @@ namespace Core
         public int RemainScoopCount;
     }
 
+    public struct IngredientSelectedEvent
+    {
+        public FoodIngredientData SelectedData;
+    }
+
     public struct TimerUpdatedEvent
     {
         public float RemainTime;
