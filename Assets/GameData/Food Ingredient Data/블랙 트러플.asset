@@ -16,7 +16,7 @@ MonoBehaviour:
   baseScore: 0
   type: 3
   rarity: 2
-  sprite: {fileID: 7641124845627605941, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
+  sprite: {fileID: -5145311920877871996, guid: 2c4e386772cb36445b9fffb662f8d0af, type: 3}
   synergies:
   - trigger:
       rid: 8392392052938375256
@@ -32,19 +32,19 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
     - rid: 8392392052938375256
       type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
+      data: 
     - rid: 8392392052938375284
       type: {class: CollectTopScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 300
-        count: 1
+        topCount: 1
     - rid: 8392392052938375285
       type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
+      data: 
     - rid: 8392392052938375286
       type: {class: CollectTopScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 300
-        count: 2
+        topCount: 1

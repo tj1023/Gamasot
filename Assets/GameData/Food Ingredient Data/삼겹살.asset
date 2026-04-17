@@ -16,7 +16,7 @@ MonoBehaviour:
   baseScore: 20
   type: 1
   rarity: 0
-  sprite: {fileID: 7781682652552636025, guid: 0d3ef515d95c88847beb34dde5c9e02b, type: 3}
+  sprite: {fileID: -5556213916453820983, guid: 2c4e386772cb36445b9fffb662f8d0af, type: 3}
   synergies: []
   isAdvanced: 0
   advancedBaseScore: 40
