@@ -55,6 +55,11 @@ namespace Core
         public float RemainTime;
     }
 
+    public struct GamePausedEvent
+    {
+        public bool IsPaused;
+    }
+
     public enum EffectTargetType
     {
         Ingredient,

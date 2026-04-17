@@ -24,6 +24,8 @@ namespace Core
 
         public void Update(GameContext context)
         {
+            if (context.IsPaused) return;
+
             if (context.RemainTime > 0)
             {
                 context.RemainTime -= Time.deltaTime;

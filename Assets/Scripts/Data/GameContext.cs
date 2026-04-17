@@ -31,6 +31,9 @@ namespace Data
         public int RemainScoopCount { get; set; }
         public int RemainSelectionCount { get; set; }
         public float RemainTime { get; set; }
+        
+        // 게임 일시정지 상태
+        public bool IsPaused { get; set; }
 
         // 현재 이벤트를 발동시킨 주체 재료
         public RuntimeIngredient Source { get; set; }

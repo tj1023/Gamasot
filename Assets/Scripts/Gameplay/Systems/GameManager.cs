@@ -12,7 +12,8 @@ namespace Gameplay.Systems
     public class GameManager : MonoBehaviour, 
         IEventListener<RequestPhaseChangeEvent>, 
         IEventListener<ItemsHarvestedEvent>,
-        IEventListener<IngredientSelectedEvent>
+        IEventListener<IngredientSelectedEvent>,
+        IEventListener<GamePausedEvent>
     {
         public static GameManager Instance { get; private set; }
 
@@ -47,6 +48,7 @@ namespace Gameplay.Systems
             EventBus<RequestPhaseChangeEvent>.Subscribe(this);
             EventBus<ItemsHarvestedEvent>.Subscribe(this);
             EventBus<IngredientSelectedEvent>.Subscribe(this);
+            EventBus<GamePausedEvent>.Subscribe(this);
 
             // 초기 상태: 재료 선택부터 시작
             _stateMachine.ChangeState(_selectionState);
@@ -62,6 +64,13 @@ namespace Gameplay.Systems
             EventBus<RequestPhaseChangeEvent>.Unsubscribe(this);
             EventBus<ItemsHarvestedEvent>.Unsubscribe(this);
             EventBus<IngredientSelectedEvent>.Unsubscribe(this);
+            EventBus<GamePausedEvent>.Unsubscribe(this);
+        }
+
+        public void OnEvent(GamePausedEvent evt)
+        {
+            Context.IsPaused = evt.IsPaused;
+            Time.timeScale = evt.IsPaused ? 0f : 1f;
         }
 
         public void OnEvent(RequestPhaseChangeEvent evt)

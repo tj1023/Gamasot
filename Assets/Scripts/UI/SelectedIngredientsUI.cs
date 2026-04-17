@@ -67,6 +67,8 @@ namespace UI
                 if (backButton != null) backButton.gameObject.SetActive(true);
             }
             
+            EventBus<GamePausedEvent>.Publish(new GamePausedEvent { IsPaused = true });
+            
             RefreshUI();
         }
 
@@ -81,6 +83,8 @@ namespace UI
                 if (scrollRect != null) scrollRect.gameObject.SetActive(false);
                 if (backButton != null) backButton.gameObject.SetActive(false);
             }
+            
+            EventBus<GamePausedEvent>.Publish(new GamePausedEvent { IsPaused = false });
         }
 
         /// <summary>

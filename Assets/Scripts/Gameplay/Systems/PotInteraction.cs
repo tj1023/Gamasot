@@ -67,7 +67,7 @@ namespace Gameplay.Systems
             bool isInsidePot = distToPotCenter <= potBoundary.Radius;
 
             var ctx = GameManager.Instance?.Context;
-            bool isScoopPhase = ctx != null && ctx.CurrentPhase == GamePhase.OnScoop;
+            bool isScoopPhase = ctx != null && ctx.CurrentPhase == GamePhase.OnScoop && !ctx.IsPaused;
 
             HandleCursorVisual(isInsidePot && isScoopPhase, worldPos);
 
@@ -75,7 +75,7 @@ namespace Gameplay.Systems
             if (isInsidePot && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 // 게임 매니저(컨텍스트) 체크하여 건지기 허용 상태인지 판별
-                if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0 })
+                if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0, IsPaused: false })
                 {
                     ScoopIngredients(worldPos);
                 }
