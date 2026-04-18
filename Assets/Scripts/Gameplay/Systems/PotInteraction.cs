@@ -124,14 +124,13 @@ namespace Gameplay.Systems
             
             if (_newHarvested.Count > 0)
             {
-                // [건질 때] 시너지 발동 처리
                 ApplyScoopSynergies(_newHarvested);
-
-                EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
-                {
-                    NewHarvestedItems = _newHarvested
-                });
             }
+
+            EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
+            {
+                NewHarvestedItems = _newHarvested
+            });
         }
 
         private void ApplyScoopSynergies(List<RuntimeIngredient> newlyScooped)
