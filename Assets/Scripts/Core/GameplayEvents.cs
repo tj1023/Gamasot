@@ -81,5 +81,6 @@ namespace Core
         public RuntimeIngredient TargetIngredient;
         public EffectTargetType TargetType;
         public float Duration;
+        public int FixedDirection; // 0: random, 1: up, -1: down
     }
 }

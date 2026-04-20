@@ -44,7 +44,7 @@ MonoBehaviour:
         targetList: 0
         bonusScore: 10
         ingredientFilter: 0
-        delay: 0.2
+        delay: 0.5
     - rid: 8392392052938375281
       type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
@@ -55,4 +55,4 @@ MonoBehaviour:
         targetList: 0
         bonusScore: 20
         ingredientFilter: 0
-        delay: 0.2
+        delay: 0.5

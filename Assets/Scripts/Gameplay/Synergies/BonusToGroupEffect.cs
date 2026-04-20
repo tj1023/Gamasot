@@ -40,17 +40,17 @@ namespace Gameplay.Synergies
 
             if (targets == null || targets.Count == 0) return null;
 
-            List<ICommand> commands = new();
+            List<RuntimeIngredient> filteredTargets = new();
             foreach (var item in targets)
             {
                 if (item == null) continue;
                 if (ingredientFilter != IngredientType.None
                     && (item.OriginalData == null || item.OriginalData.type != ingredientFilter)) continue;
 
-                commands.Add(new AddScoreCommand(source, item, bonusScore, delay));
+                filteredTargets.Add(item);
             }
 
-            return commands.Count > 0 ? new CompositeCommand(commands) : null;
+            return filteredTargets.Count > 0 ? new AddScoreToGroupCommand(source, filteredTargets, bonusScore, delay) : null;
         }
     }
 }

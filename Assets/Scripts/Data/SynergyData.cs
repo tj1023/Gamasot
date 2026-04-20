@@ -44,5 +44,24 @@ namespace Data
                 while (enumerator != null && enumerator.MoveNext()) { }
             }
         }
+
+        /// <summary>
+        /// 비동기 처리를 위해 시너지 효과 커맨드들을 생성하여 큐에 적재합니다.
+        /// </summary>
+        public void EvaluateAndEnqueueCommands(GameContext context, Queue<ICommand> commandQueue)
+        {
+            if (trigger == null || !trigger.Evaluate(context)) return;
+
+            foreach (var effect in effects)
+            {
+                if (effect == null) continue;
+
+                var cmd = effect.GenerateCommand(context, context.Source);
+                if (cmd != null)
+                {
+                    commandQueue.Enqueue(cmd);
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace UI
     {
         public static ScoreUIRegistry Instance { get; private set; }
 
-        private readonly Dictionary<RuntimeIngredient, RectTransform> _cells = new();
+        private readonly Dictionary<RuntimeIngredient, Transform> _cells = new();
         
         [Header("Global Score Texts")]
         [SerializeField] private RectTransform totalScoreRect;
@@ -34,11 +34,11 @@ namespace UI
            totalScoreRect = totalScore;
         }
 
-        public void RegisterIngredient(RuntimeIngredient ingredient, RectTransform rectTransform)
+        public void RegisterIngredient(RuntimeIngredient ingredient, Transform ingredientTransform)
         {
-            if (ingredient != null && rectTransform != null)
+            if (ingredient != null && ingredientTransform != null)
             {
-                _cells[ingredient] = rectTransform;
+                _cells[ingredient] = ingredientTransform;
             }
         }
 
@@ -51,11 +51,18 @@ namespace UI
         }
 
         /// <summary>
-        /// RectTransform의 중심점을 월드 좌표로 반환합니다.
+        /// Transform의 중심점을 월드 좌표로 반환합니다. RectTransform일 경우 rect의 중심을 보정합니다.
         /// </summary>
-        private Vector3 GetWorldPosition(RectTransform rectTransform)
+        private Vector3 GetWorldPosition(Transform targetTransform)
         {
-            return rectTransform == null ? Vector3.zero : rectTransform.TransformPoint(rectTransform.rect.center);
+            if (targetTransform == null) return Vector3.zero;
+
+            if (targetTransform is RectTransform rectTransform)
+            {
+                return rectTransform.TransformPoint(rectTransform.rect.center);
+            }
+            
+            return targetTransform.position;
         }
 
         public bool TryGetIngredientPosition(RuntimeIngredient ingredient, out Vector3 position)

@@ -92,11 +92,11 @@ namespace UI
             if (hasStart && hasEnd && startPos != endPos)
             {
                 var trailObj = _pool.Get();
-                StartCoroutine(MoveRoutine(trailObj, startPos, endPos, eventData.Duration));
+                StartCoroutine(MoveRoutine(trailObj, startPos, endPos, eventData.Duration, eventData.FixedDirection));
             }
         }
 
-        private IEnumerator MoveRoutine(GameObject obj, Vector3 start, Vector3 end, float duration)
+        private IEnumerator MoveRoutine(GameObject obj, Vector3 start, Vector3 end, float duration, int fixedDirection = 0)
         {
             obj.transform.position = start;
             
@@ -115,8 +115,14 @@ namespace UI
             float height = distance * Random.Range(0.2f, 0.5f);
             
             // 방향을 랜덤하게 해서 위로 또는 아래로 휘어지게
-            if (Random.value > 0.5f) height = -height;
-            
+            if (fixedDirection == 0)
+            {
+                if (Random.value > 0.5f) height = -height;
+            }
+            else
+            {
+                height = Mathf.Abs(height) * fixedDirection;
+            }            
             Vector3 controlPoint = center + perpendicular * height;
 
             float elapsed = 0f;

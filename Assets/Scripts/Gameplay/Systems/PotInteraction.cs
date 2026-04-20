@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using Core;
 using Data;
+using Interfaces;
+
 // FoodIngredientData 및 기타 컨텍스트 연동을 위함
 
 namespace Gameplay.Systems
@@ -49,9 +51,11 @@ namespace Gameplay.Systems
             }
         }
 
+        private bool _isProcessingScoop;
+
         private void Update()
         {
-            if (potBoundary == null || Mouse.current == null) return;
+            if (_isProcessingScoop || potBoundary == null || Mouse.current == null) return;
 
             Vector2 mousePos2D = Mouse.current.position.ReadValue();
             Vector3 mousePos = new Vector3(mousePos2D.x, mousePos2D.y, 0f)
@@ -77,7 +81,7 @@ namespace Gameplay.Systems
                 // 게임 매니저(컨텍스트) 체크하여 건지기 허용 상태인지 판별
                 if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0, IsPaused: false })
                 {
-                    ScoopIngredients(worldPos);
+                    StartCoroutine(ScoopIngredientsAsync(worldPos, ctx));
                 }
             }
         }
@@ -105,11 +109,16 @@ namespace Gameplay.Systems
             }
         }
 
-        private void ScoopIngredients(Vector2 scoopPos)
+        private System.Collections.IEnumerator ScoopIngredientsAsync(Vector2 scoopPos, GameContext ctx)
         {
+            _isProcessingScoop = true;
+            ctx.IsPaused = true;
+            HandleCursorVisual(false, scoopPos); // 숨기기
+
             int count = Physics2D.OverlapCircle(scoopPos, scoopRadius, _ingredientFilter, _overlapResults);
 
             _newHarvested.Clear();
+            List<IngredientEntity> overlappingNodes = new();
 
             for (int i = 0; i < count; i++)
             {
@@ -118,22 +127,32 @@ namespace Gameplay.Systems
                 if (node != null && node.RuntimeData != null && node.gameObject.activeInHierarchy)
                 {
                     _newHarvested.Add(node.RuntimeData);
-                    ingredientManager.ReturnToPool(node);
+                    overlappingNodes.Add(node);
                 }
             }
             
             if (_newHarvested.Count > 0)
             {
-                ApplyScoopSynergies(_newHarvested);
+                yield return StartCoroutine(ApplyScoopSynergiesAsync(_newHarvested));
+
+                // 연출 완료 후 UI로 수거
+                foreach (var node in overlappingNodes)
+                {
+                    ingredientManager.ReturnToPool(node);
+                }
+
+                EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
+                {
+                    NewHarvestedItems = _newHarvested
+                });
             }
 
-            EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
-            {
-                NewHarvestedItems = _newHarvested
-            });
+            _isProcessingScoop = false;
+            ctx.IsPaused = false;
+            HandleCursorVisual(true, scoopPos); // 다시 보이기 (마우스가 여전히 솥 안쪽이라면)
         }
 
-        private void ApplyScoopSynergies(List<RuntimeIngredient> newlyScooped)
+        private System.Collections.IEnumerator ApplyScoopSynergiesAsync(List<RuntimeIngredient> newlyScooped)
         {
             var scoopContext = GameManager.Instance.Context;
 
@@ -150,6 +169,8 @@ namespace Gameplay.Systems
             scoopContext.SetLastScooped(newlyScooped);
             scoopContext.SetPotIngredients(_potIngredients);
 
+            Queue<ICommand> commandQueue = new Queue<ICommand>();
+
             foreach (var ingredient in newlyScooped)
             {
                 if (ingredient == null || ingredient.OriginalData == null) continue;
@@ -158,8 +179,14 @@ namespace Gameplay.Systems
 
                 foreach (var synergy in ingredient.ActiveSynergies)
                 {
-                    synergy?.EvaluateAndApply(scoopContext);
+                    synergy?.EvaluateAndEnqueueCommands(scoopContext, commandQueue);
                 }
+            }
+
+            while (commandQueue.Count > 0)
+            {
+                var command = commandQueue.Dequeue();
+                yield return command.ExecuteAsync();
             }
         }
 

@@ -17,6 +17,8 @@ MonoBehaviour:
   type: 4
   rarity: 0
   sprite: {fileID: 3416722320431985956, guid: 2c4e386772cb36445b9fffb662f8d0af, type: 3}
+  count: 4
+  desc: 
   synergies:
   - trigger:
       rid: 8392392052938375240
@@ -42,7 +44,7 @@ MonoBehaviour:
         targetList: 2
         bonusScore: 2
         ingredientFilter: 0
-        delay: 0
+        delay: 0.5
     - rid: 8392392052938375265
       type: {class: OnScoopTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
@@ -53,4 +55,4 @@ MonoBehaviour:
         targetList: 2
         bonusScore: 4
         ingredientFilter: 0
-        delay: 0
+        delay: 0.5

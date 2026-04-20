@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Data;
+using UI;
 
 namespace Gameplay.Systems
 {
@@ -51,6 +52,11 @@ namespace Gameplay.Systems
             // 자연스러운 초기 회전 속도 부여
             float randomRot = UnityEngine.Random.Range(minRotationSpeed, maxRotationSpeed);
             _rb.angularVelocity = UnityEngine.Random.value > 0.5f ? randomRot : -randomRot;
+
+            if (ScoreUIRegistry.Instance != null)
+            {
+                ScoreUIRegistry.Instance.RegisterIngredient(RuntimeData, transform);
+            }
         }
 
         /// <summary>
@@ -59,6 +65,14 @@ namespace Gameplay.Systems
         /// </summary>
         private void FixedUpdate()
         {
+            var ctx = GameManager.Instance?.Context;
+            if (ctx != null && ctx.IsPaused)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                _rb.angularVelocity = 0f;
+                return;
+            }
+
             float currentSpeed = _rb.linearVelocity.magnitude;
             
             // 속도가 0에 수렴하는 등 일정 수치 이하라면 강제로 최소 속도 부여
@@ -92,6 +106,11 @@ namespace Gameplay.Systems
             // 오브젝트가 비활성화될 때 초기화 처리
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
+
+            if (ScoreUIRegistry.Instance != null && RuntimeData != null)
+            {
+                ScoreUIRegistry.Instance.UnregisterIngredient(RuntimeData);
+            }
         }
     }
 }
