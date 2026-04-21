@@ -27,7 +27,7 @@ namespace Gameplay.Commands
 
             float trailDuration = _delay * 0.8f;
             bool hasTrail = false;
-            int fixedDirection = UnityEngine.Random.value > 0.5f ? 1 : -1;
+            int fixedDirection = 1; // 1: Source 기준 좌/우 대칭 곡선
 
             foreach (var target in _targets)
             {

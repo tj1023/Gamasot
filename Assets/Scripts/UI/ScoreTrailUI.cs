@@ -119,6 +119,11 @@ namespace UI
             {
                 if (Random.value > 0.5f) height = -height;
             }
+            else if (fixedDirection == 1)
+            {
+                // Source 기준으로 타겟이 오른쪽에 있는지 왼쪽에 있는지에 따라 방향 결정 (좌우 대칭 분수 형태)
+                height = Mathf.Abs(height) * (end.x > start.x ? 1 : -1);
+            }
             else
             {
                 height = Mathf.Abs(height) * fixedDirection;
