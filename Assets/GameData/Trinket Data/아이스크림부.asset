@@ -15,5 +15,5 @@ MonoBehaviour:
   trinketName: "\uC544\uC774\uC2A4\uD06C\uB9BC\uBD80"
   sprite: {fileID: 3300254798320090319, guid: 197a52767fb4fc94bafd6c26bd3beaf1, type: 3}
   description: "\uAC74\uC9C0\uAE30 \uD69F\uC218 +1"
-  maxAccumulationCount: 1
+  maxAccumulationCount: 3
   effectType: 8
