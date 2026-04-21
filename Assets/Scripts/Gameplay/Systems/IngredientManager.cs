@@ -45,6 +45,7 @@ namespace Gameplay.Systems
         {
             switch (eventData.NewPhase)
             {
+                case GamePhase.OnTrinketSelection:
                 case GamePhase.OnSelection:
                     ClearAll();
                     break;
@@ -118,7 +119,7 @@ namespace Gameplay.Systems
         /// <summary>
         /// 풀에서 오브젝트를 꺼내와서 원형 공간 안에 무작위 위치로 스폰합니다.
         /// </summary>
-        private void SpawnIngredient(FoodIngredientData data)
+        public void SpawnIngredient(FoodIngredientData data)
         {
             IngredientEntity ingredient = _ingredientPool.Get();
             
@@ -135,6 +136,52 @@ namespace Gameplay.Systems
         public void ReturnToPool(IngredientEntity node)
         {
             _ingredientPool.Release(node);
+        }
+
+        public void TransformRandomToAdvanced(int count)
+        {
+            int transformed = 0;
+            // 리스트를 셔플하거나 랜덤하게 접근
+            var indices = ListPool<int>.Get();
+            for (int i = 0; i < ActiveIngredients.Count; i++) indices.Add(i);
+
+            for (int i = 0; i < indices.Count; i++)
+            {
+                int r = Random.Range(i, indices.Count);
+                (indices[i], indices[r]) = (indices[r], indices[i]);
+            }
+
+            foreach (int index in indices)
+            {
+                var ingredient = ActiveIngredients[index];
+                if (!ingredient.RuntimeData.IsAdvanced)
+                {
+                    ingredient.RuntimeData.TransformToAdvanced();
+                    transformed++;
+                    if (transformed >= count) break;
+                }
+            }
+
+            ListPool<int>.Release(indices);
+        }
+
+        private void FixedUpdate()
+        {
+            var ctx = GameManager.Instance?.Context;
+            if (ctx is { HasPuddingEffect: true, IsPaused: false })
+            {
+                Vector3 center = potBoundary.transform.position;
+                float pullForce = 0.6f; // 중심축으로 당기는 힘 (필요시 조절)
+                
+                foreach (var ingredient in ActiveIngredients)
+                {
+                    if (ingredient.TryGetComponent<Rigidbody2D>(out var rb))
+                    {
+                        Vector2 dir = (center - ingredient.transform.position).normalized;
+                        rb.AddForce(dir * pullForce, ForceMode2D.Force);
+                    }
+                }
+            }
         }
     }
 }

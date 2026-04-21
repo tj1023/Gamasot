@@ -6,6 +6,7 @@ namespace Core
     public struct ItemsHarvestedEvent
     {
         public List<RuntimeIngredient> NewHarvestedItems;
+        public bool IsBonus;
     }
 
     public struct IngredientScoreChangedEvent
@@ -50,6 +51,11 @@ namespace Core
         public FoodIngredientData SelectedData;
     }
 
+    public struct TrinketSelectedEvent
+    {
+        public TrinketData SelectedTrinket;
+    }
+
     public struct RequestDeleteExcessEvent
     {
         public int ExcessCount;
@@ -57,6 +63,16 @@ namespace Core
 
     public struct ExcessDeletedEvent
     {
+    }
+
+    public struct RequestDiscoverEvent
+    {
+        public List<FoodIngredientData> Candidates;
+    }
+
+    public struct DiscoverItemSelectedEvent
+    {
+        public FoodIngredientData SelectedData;
     }
 
     public struct TimerUpdatedEvent
@@ -82,5 +98,9 @@ namespace Core
         public EffectTargetType TargetType;
         public float Duration;
         public int FixedDirection; // 0: random, 1: up, -1: down
+    }
+
+    public struct OwnedTrinketsUpdatedEvent
+    {
     }
 }

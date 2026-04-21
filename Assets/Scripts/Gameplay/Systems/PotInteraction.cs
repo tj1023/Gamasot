@@ -71,9 +71,10 @@ namespace Gameplay.Systems
             bool isInsidePot = distToPotCenter <= potBoundary.Radius;
 
             var ctx = GameManager.Instance?.Context;
-            bool isScoopPhase = ctx != null && ctx.CurrentPhase == GamePhase.OnScoop && !ctx.IsPaused;
+            bool isScoopPhase = ctx is { CurrentPhase: GamePhase.OnScoop, IsPaused: false };
+            float currentRadius = scoopRadius * (ctx?.ScoopRadiusModifier ?? 1f);
 
-            HandleCursorVisual(isInsidePot && isScoopPhase, worldPos);
+            HandleCursorVisual(isInsidePot && isScoopPhase, worldPos, currentRadius);
 
             // 솥 안에 방금 막 클릭이 발생했을 때
             if (isInsidePot && Mouse.current.leftButton.wasPressedThisFrame)
@@ -81,12 +82,12 @@ namespace Gameplay.Systems
                 // 게임 매니저(컨텍스트) 체크하여 건지기 허용 상태인지 판별
                 if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0, IsPaused: false })
                 {
-                    StartCoroutine(ScoopIngredientsAsync(worldPos, ctx));
+                    StartCoroutine(ScoopIngredientsAsync(worldPos, currentRadius, ctx));
                 }
             }
         }
 
-        private void HandleCursorVisual(bool isInsidePot, Vector2 worldPos)
+        private void HandleCursorVisual(bool isInsidePot, Vector2 worldPos, float currentRadius)
         {
             if (cursorVisual == null) return;
 
@@ -98,6 +99,7 @@ namespace Gameplay.Systems
                     Cursor.visible = false; // 기본 마우스 커서 숨기기
                 }
                 cursorVisual.position = worldPos;
+                cursorVisual.localScale = new Vector3(currentRadius * 2f, currentRadius * 2f, 1f);
             }
             else
             {
@@ -109,13 +111,13 @@ namespace Gameplay.Systems
             }
         }
 
-        private System.Collections.IEnumerator ScoopIngredientsAsync(Vector2 scoopPos, GameContext ctx)
+        private System.Collections.IEnumerator ScoopIngredientsAsync(Vector2 scoopPos, float currentRadius, GameContext ctx)
         {
             _isProcessingScoop = true;
             ctx.IsPaused = true;
-            HandleCursorVisual(false, scoopPos); // 숨기기
+            HandleCursorVisual(false, scoopPos, currentRadius); // 숨기기
 
-            int count = Physics2D.OverlapCircle(scoopPos, scoopRadius, _ingredientFilter, _overlapResults);
+            int count = Physics2D.OverlapCircle(scoopPos, currentRadius, _ingredientFilter, _overlapResults);
 
             _newHarvested.Clear();
             List<IngredientEntity> overlappingNodes = new();
@@ -140,16 +142,16 @@ namespace Gameplay.Systems
                 {
                     ingredientManager.ReturnToPool(node);
                 }
-
-                EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
-                {
-                    NewHarvestedItems = _newHarvested
-                });
             }
+
+            EventBus<ItemsHarvestedEvent>.Publish(new ItemsHarvestedEvent
+            {
+                NewHarvestedItems = _newHarvested
+            });
 
             _isProcessingScoop = false;
             ctx.IsPaused = false;
-            HandleCursorVisual(true, scoopPos); // 다시 보이기 (마우스가 여전히 솥 안쪽이라면)
+            HandleCursorVisual(true, scoopPos, currentRadius); // 다시 보이기 (마우스가 여전히 솥 안쪽이라면)
         }
 
         private System.Collections.IEnumerator ApplyScoopSynergiesAsync(List<RuntimeIngredient> newlyScooped)

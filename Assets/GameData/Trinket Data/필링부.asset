@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4124b0ace544abd4c809698909eabd36, type: 3}
+  m_Name: "\uD544\uB9C1\uBD80"
+  m_EditorClassIdentifier: Assembly-CSharp::Data.TrinketData
+  trinketName: "\uD544\uB9C1\uBD80"
+  sprite: {fileID: -6917502232861540268, guid: 197a52767fb4fc94bafd6c26bd3beaf1, type: 3}
+  description: "\uAC74\uC9C0\uAE30 \uBC94\uC704 \uC99D\uAC00"
+  maxAccumulationCount: 1
+  effectType: 9

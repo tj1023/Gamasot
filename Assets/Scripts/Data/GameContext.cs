@@ -5,6 +5,7 @@ namespace Data
     public enum GamePhase
     {
         None,
+        OnTrinketSelection,
         OnSelection,
         OnScoop,
         OnSettlement
@@ -69,5 +70,12 @@ namespace Data
             PotIngredients.Clear();
             PotIngredients.AddRange(source);
         }
+
+        // 장식품(Trinket) 데이터
+        public Dictionary<TrinketData, int> TrinketCounts { get; } = new();
+        
+        // 장식품 패시브 효과들
+        public float ScoopRadiusModifier { get; set; } = 1f;
+        public bool HasPuddingEffect { get; set; }
     }
 }

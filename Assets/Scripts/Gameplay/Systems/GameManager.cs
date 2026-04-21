@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Core;
 using Data;
@@ -24,6 +25,9 @@ namespace Gameplay.Systems
         private SelectionState _selectionState;
         private PlayingState _playingState;
         private SettlementState _settlementState;
+        private TrinketSelectionState _trinketSelectionState;
+
+        private Action _onExcessResolved;
 
         private void Awake()
         {
@@ -41,6 +45,7 @@ namespace Gameplay.Systems
             _selectionState = new SelectionState();
             _playingState = new PlayingState();
             _settlementState = new SettlementState();
+            _trinketSelectionState = new TrinketSelectionState();
         }
 
         private void Start()
@@ -80,6 +85,9 @@ namespace Gameplay.Systems
         {
             switch (evt.TargetPhase)
             {
+                case GamePhase.OnTrinketSelection:
+                    _stateMachine.ChangeState(_trinketSelectionState);
+                    break;
                 case GamePhase.OnSelection:
                     _stateMachine.ChangeState(_selectionState);
                     break;
@@ -104,21 +112,40 @@ namespace Gameplay.Systems
 
             if (Context.RemainSelectionCount <= 0)
             {
-                // 모든 선택이 끝난 후에 초과분 확인
-                if (Context.SelectedIngredients.Count > Context.MaxSelectedIngredients)
-                {
-                    int excessCount = Context.SelectedIngredients.Count - Context.MaxSelectedIngredients;
-                    EventBus<RequestDeleteExcessEvent>.Publish(new RequestDeleteExcessEvent { ExcessCount = excessCount });
-                    return;
-                }
+                CheckExcessIngredients(ProceedAfterSelection);
             }
+            else
+            {
+                ProceedAfterSelection();
+            }
+        }
 
-            ProceedAfterSelection();
+        public void CheckExcessIngredients(Action onResolved)
+        {
+            if (Context.SelectedIngredients.Count > Context.MaxSelectedIngredients)
+            {
+                int excessCount = Context.SelectedIngredients.Count - Context.MaxSelectedIngredients;
+                _onExcessResolved = onResolved;
+                EventBus<RequestDeleteExcessEvent>.Publish(new RequestDeleteExcessEvent { ExcessCount = excessCount });
+            }
+            else
+            {
+                onResolved?.Invoke();
+            }
         }
 
         public void OnEvent(ExcessDeletedEvent evt)
         {
-            ProceedAfterSelection();
+            if (_onExcessResolved != null)
+            {
+                var action = _onExcessResolved;
+                _onExcessResolved = null;
+                action.Invoke();
+            }
+            else
+            {
+                ProceedAfterSelection();
+            }
         }
 
         private void ProceedAfterSelection()
@@ -150,7 +177,7 @@ namespace Gameplay.Systems
             }
 
             // 건지기 횟수 소진 및 UI 이벤트 브로드캐스팅
-            if (Context.CurrentPhase == GamePhase.OnScoop)
+            if (!evt.IsBonus && Context.CurrentPhase == GamePhase.OnScoop)
             {
                 Context.RemainScoopCount--;
                 

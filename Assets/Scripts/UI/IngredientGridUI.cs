@@ -58,7 +58,7 @@ namespace UI
 
         public void OnEvent(PhaseChangedEvent eventData)
         {
-            if (eventData.NewPhase == GamePhase.OnScoop)
+            if (eventData.NewPhase is GamePhase.OnSelection or GamePhase.OnTrinketSelection)
             {
                 ClearCells();
             }

@@ -14,7 +14,8 @@ namespace UI
     /// </summary>
     public class IngredientSelectionUI : MonoBehaviour, 
         IEventListener<PhaseChangedEvent>,
-        IEventListener<RequestDeleteExcessEvent>
+        IEventListener<RequestDeleteExcessEvent>,
+        IEventListener<RequestDiscoverEvent>
     {
         [Header("UI References")]
         [SerializeField] private GameObject rootPanel;
@@ -33,6 +34,7 @@ namespace UI
 
         private IngredientInfoUI[] _cards;
         private bool _initialized;
+        private bool _isDiscoverMode;
 
         private void Awake()
         {
@@ -74,12 +76,14 @@ namespace UI
         {
             EventBus<PhaseChangedEvent>.Subscribe(this);
             EventBus<RequestDeleteExcessEvent>.Subscribe(this);
+            EventBus<RequestDiscoverEvent>.Subscribe(this);
         }
 
         private void OnDisable()
         {
             EventBus<PhaseChangedEvent>.Unsubscribe(this);
             EventBus<RequestDeleteExcessEvent>.Unsubscribe(this);
+            EventBus<RequestDiscoverEvent>.Unsubscribe(this);
         }
 
         public void OnEvent(PhaseChangedEvent eventData)
@@ -101,17 +105,30 @@ namespace UI
             HideCandidates();
         }
 
+        public void OnEvent(RequestDiscoverEvent eventData)
+        {
+            _isDiscoverMode = true;
+            ShowCandidates(eventData.Candidates);
+        }
+
         private void ShowCandidates()
         {
             if (ingredientPool == null || ingredientPool.Length == 0) return;
 
+            ShowCandidates(ingredientPool);
+        }
+
+        private void ShowCandidates(System.Collections.Generic.IList<FoodIngredientData> candidates)
+        {
+            if (candidates == null || candidates.Count == 0) return;
+
             if(rootPanel != null) rootPanel.SetActive(true);
 
             // Fisher-Yates 부분 셔플로 중복 없는 무작위 후보 선택 (GC 할당 최소화)
-            int count = Mathf.Min(candidateCount, ingredientPool.Length);
+            int count = Mathf.Min(candidateCount, candidates.Count);
 
             var indices = ListPool<int>.Get();
-            for (int i = 0; i < ingredientPool.Length; i++)
+            for (int i = 0; i < candidates.Count; i++)
                 indices.Add(i);
 
             for (int i = 0; i < count; i++)
@@ -122,13 +139,18 @@ namespace UI
 
             for (int i = 0; i < count; i++)
             {
-                FoodIngredientData data = ingredientPool[indices[i]];
+                FoodIngredientData data = candidates[indices[i]];
                 _cards[i].Setup(data);
                 _cards[i].OnSelected = OnIngredientSelected;
                 _cards[i].gameObject.SetActive(true);
             }
 
             ListPool<int>.Release(indices);
+
+            for (int i = count; i < candidateCount; i++)
+            {
+                _cards[i].gameObject.SetActive(false);
+            }
         }
 
         private void HideCandidates()
@@ -144,18 +166,30 @@ namespace UI
             }
         }
 
-        private static void OnSkipButtonClicked()
+        private void OnSkipButtonClicked()
         {
             // 선택을 건너뛰는 경우 null을 전달합니다.
             OnIngredientSelected(null);
         }
 
-        private static void OnIngredientSelected(FoodIngredientData data)
+        private void OnIngredientSelected(FoodIngredientData data)
         {
-            EventBus<IngredientSelectedEvent>.Publish(new IngredientSelectedEvent
+            if (_isDiscoverMode)
             {
-                SelectedData = data
-            });
+                _isDiscoverMode = false;
+                HideCandidates();
+                EventBus<DiscoverItemSelectedEvent>.Publish(new DiscoverItemSelectedEvent
+                {
+                    SelectedData = data
+                });
+            }
+            else
+            {
+                EventBus<IngredientSelectedEvent>.Publish(new IngredientSelectedEvent
+                {
+                    SelectedData = data
+                });
+            }
         }
     }
 }
