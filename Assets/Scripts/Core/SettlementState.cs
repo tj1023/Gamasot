@@ -37,6 +37,9 @@ namespace Core
                 GameManager.Instance.StopCoroutine(_settlementCoroutine);
                 _settlementCoroutine = null;
             }
+            
+            // 만약 상태를 벗어날 때 배속이 적용되어 있다면 원래대로 복구
+            Time.timeScale = 1f;
         }
 
         private struct ModifierInstance
@@ -98,11 +101,20 @@ namespace Core
             _commandQueue.Enqueue(new FinalizeRoundScoreCommand(context));
 
             // 2. 비동기 커맨드 순차 실행 (UI 애니메이션 적용)
+            float startTime = Time.unscaledTime;
             while (_commandQueue.Count > 0)
             {
+                float elapsedTime = Time.unscaledTime - startTime;
+                if (elapsedTime > 10f)
+                {
+                    Time.timeScale = 2f;
+                }
+
                 var command = _commandQueue.Dequeue();
                 yield return command.ExecuteAsync();
             }
+            
+            Time.timeScale = 1f;
             
             // 3. 잠시 후 다음 라운드로 진행
             yield return WaitCache.Seconds(1f);
