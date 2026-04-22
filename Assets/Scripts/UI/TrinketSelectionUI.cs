@@ -11,6 +11,7 @@ namespace UI
     public class TrinketSelectionUI : MonoBehaviour, 
         IEventListener<PhaseChangedEvent>
     {
+        private bool _isSelecting;
         [Header("UI References")]
         [SerializeField] private GameObject rootPanel;
         [SerializeField] private RectTransform container;
@@ -84,6 +85,7 @@ namespace UI
 
         private void ShowCandidates()
         {
+            _isSelecting = false;
             if (trinketPool == null || trinketPool.Length == 0)
             {
                 // 장식품 풀이 없으면 건너뛰기 처리
@@ -97,6 +99,8 @@ namespace UI
             
             foreach (var trinket in trinketPool)
             {
+                if (trinket == null) continue;
+
                 int currentCount = 0;
                 if (ctx.TrinketCounts.TryGetValue(trinket, out int c))
                 {
@@ -165,6 +169,9 @@ namespace UI
 
         private void OnTrinketSelected(TrinketData data)
         {
+            if (_isSelecting) return;
+            _isSelecting = true;
+
             HideCandidates();
             
             EventBus<TrinketSelectedEvent>.Publish(new TrinketSelectedEvent

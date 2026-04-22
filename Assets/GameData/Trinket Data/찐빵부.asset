@@ -16,4 +16,14 @@ MonoBehaviour:
   sprite: {fileID: -6451116661026527665, guid: 197a52767fb4fc94bafd6c26bd3beaf1, type: 3}
   description: "\uBCF4\uC720\uC911\uC778 \uBAA8\uB4E0 \uD76C\uADC0 \uCE74\uB4DC +1"
   maxAccumulationCount: 1
-  effectType: 5
+  effect:
+    rid: 8392392440219959374
+  references:
+    version: 2
+    RefIds:
+    - rid: 8392392440219959374
+      type: {class: DuplicateCardsEffect, ns: Gameplay.TrinketEffects, asm: Assembly-CSharp}
+      data:
+        targetRarity: 1
+        duplicateAll: 1
+        count: 1

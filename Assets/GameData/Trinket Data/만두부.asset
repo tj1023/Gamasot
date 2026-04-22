@@ -17,4 +17,14 @@ MonoBehaviour:
   description: "\uBCF4\uC720\uC911\uC778 \uB79C\uB364 \uC804\uC124 \uCE74\uB4DC 1\uC7A5
     +1"
   maxAccumulationCount: 1
-  effectType: 4
+  effect:
+    rid: 8392392440219959368
+  references:
+    version: 2
+    RefIds:
+    - rid: 8392392440219959368
+      type: {class: DuplicateCardsEffect, ns: Gameplay.TrinketEffects, asm: Assembly-CSharp}
+      data:
+        targetRarity: 2
+        duplicateAll: 0
+        count: 1

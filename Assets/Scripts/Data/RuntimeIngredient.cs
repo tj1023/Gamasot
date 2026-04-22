@@ -39,7 +39,7 @@ namespace Data
         {
             OriginalData = data;
             IsAdvanced = data.isAdvanced;
-            _currentScore = data.ActiveBaseScore; // backing field 직접 대입으로 불필요한 이벤트 발행 우회
+            _currentScore = data.ActiveBaseScore;
         }
         
         public List<SynergyData> ActiveSynergies => IsAdvanced ? OriginalData.advancedSynergies : OriginalData.synergies;

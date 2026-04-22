@@ -30,25 +30,26 @@ namespace Data
         /// </summary>
         public void EvaluateAndApply(GameContext context)
         {
-            if (trigger == null || !trigger.Evaluate(context)) return;
-
-            foreach (var effect in effects)
+            ForEachTriggeredCommand(context, cmd =>
             {
-                if (effect == null) continue;
-
-                var cmd = effect.GenerateCommand(context, context.Source);
-                if (cmd == null) continue;
-
                 // 의도된 동기 실행: 코루틴 열거자를 즉시 소비하여 애니메이션/대기 없이 점수만 반영
                 var enumerator = cmd.ExecuteAsync();
                 while (enumerator != null && enumerator.MoveNext()) { }
-            }
+            });
         }
 
         /// <summary>
         /// 비동기 처리를 위해 시너지 효과 커맨드들을 생성하여 큐에 적재합니다.
         /// </summary>
         public void EvaluateAndEnqueueCommands(GameContext context, Queue<ICommand> commandQueue)
+        {
+            ForEachTriggeredCommand(context, commandQueue.Enqueue);
+        }
+
+        /// <summary>
+        /// 트리거 조건을 평가하고, 충족 시 각 이펙트의 커맨드를 생성하여 콜백으로 전달합니다.
+        /// </summary>
+        private void ForEachTriggeredCommand(GameContext context, Action<ICommand> action)
         {
             if (trigger == null || !trigger.Evaluate(context)) return;
 
@@ -59,7 +60,7 @@ namespace Data
                 var cmd = effect.GenerateCommand(context, context.Source);
                 if (cmd != null)
                 {
-                    commandQueue.Enqueue(cmd);
+                    action(cmd);
                 }
             }
         }

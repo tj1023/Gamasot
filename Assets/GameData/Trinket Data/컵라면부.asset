@@ -16,4 +16,13 @@ MonoBehaviour:
   sprite: {fileID: -1045916304214691486, guid: 197a52767fb4fc94bafd6c26bd3beaf1, type: 3}
   description: "\uCE74\uB4DC \uCD5C\uB300 \uBCF4\uC720 +1"
   maxAccumulationCount: 3
-  effectType: 6
+  effect:
+    rid: 8392392440219959376
+  references:
+    version: 2
+    RefIds:
+    - rid: 8392392440219959376
+      type: {class: StatModifierEffect, ns: Gameplay.TrinketEffects, asm: Assembly-CSharp}
+      data:
+        statType: 0
+        amount: 1

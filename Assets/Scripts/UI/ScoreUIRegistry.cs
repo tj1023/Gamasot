@@ -13,9 +13,7 @@ namespace UI
         public static ScoreUIRegistry Instance { get; private set; }
 
         private readonly Dictionary<RuntimeIngredient, Transform> _cells = new();
-        
-        [Header("Global Score Texts")]
-        [SerializeField] private RectTransform totalScoreRect;
+        private RectTransform _totalScoreRect;
 
         private void Awake()
         {
@@ -31,7 +29,7 @@ namespace UI
 
         public void RegisterTotalScore(RectTransform totalScore)
         {
-           totalScoreRect = totalScore;
+           _totalScoreRect = totalScore;
         }
 
         public void RegisterIngredient(RuntimeIngredient ingredient, Transform ingredientTransform)
@@ -78,9 +76,9 @@ namespace UI
 
         public bool TryGetTotalScorePosition(out Vector3 position)
         {
-            if (totalScoreRect != null)
+            if (_totalScoreRect != null)
             {
-                position = GetWorldPosition(totalScoreRect);
+                position = GetWorldPosition(_totalScoreRect);
                 return true;
             }
             position = Vector3.zero;

@@ -54,27 +54,37 @@ namespace Data
         public List<RuntimeIngredient> PotIngredients { get; } = new();
 
         /// <summary>
-        /// LastScooped 리스트의 내용물을 교체합니다. 리스트 인스턴스 자체는 유지됩니다.
+        /// 리스트의 내용물을 교체합니다. 리스트 인스턴스 자체는 유지됩니다.
         /// </summary>
-        public void SetLastScooped(List<RuntimeIngredient> source)
+        private static void ReplaceContents<T>(List<T> target, List<T> source)
         {
-            LastScooped.Clear();
-            LastScooped.AddRange(source);
+            target.Clear();
+            target.AddRange(source);
         }
 
         /// <summary>
-        /// PotIngredients 리스트의 내용물을 교체합니다. 리스트 인스턴스 자체는 유지됩니다.
+        /// LastScooped 리스트의 내용물을 교체합니다.
         /// </summary>
-        public void SetPotIngredients(List<RuntimeIngredient> source)
-        {
-            PotIngredients.Clear();
-            PotIngredients.AddRange(source);
-        }
+        public void SetLastScooped(List<RuntimeIngredient> source) => ReplaceContents(LastScooped, source);
+
+        /// <summary>
+        /// PotIngredients 리스트의 내용물을 교체합니다.
+        /// </summary>
+        public void SetPotIngredients(List<RuntimeIngredient> source) => ReplaceContents(PotIngredients, source);
 
         // 장식품(Trinket) 데이터
         public Dictionary<TrinketData, int> TrinketCounts { get; } = new();
         
         // 장식품 패시브 효과들
+        public TrinketModifiers TrinketModifiers { get; } = new();
+    }
+
+    /// <summary>
+    /// 장식품(Trinket)에 의한 패시브 효과들을 관리합니다.
+    /// 새 Trinket 패시브가 추가될 때 이 클래스만 확장하면 됩니다.
+    /// </summary>
+    public class TrinketModifiers
+    {
         public float ScoopRadiusModifier { get; set; } = 1f;
         public bool HasPuddingEffect { get; set; }
     }

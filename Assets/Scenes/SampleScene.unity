@@ -2612,7 +2612,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58ee667cba39f284e98932e2b980c8cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.ScoreUIRegistry
-  totalScoreRect: {fileID: 0}
 --- !u!114 &1450446216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2662,6 +2661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a27c52d49faefff4aba3fdf1fbf68666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gameplay.Systems.TrinketManager
+  ingredientManager: {fileID: 1102805688}
   allIngredients:
   - {fileID: 11400000, guid: 6bc909f9b063078438b18fc7529e5e80, type: 2}
   - {fileID: 11400000, guid: ec7cdbaf73630f44fb98cc55a77ecfa4, type: 2}

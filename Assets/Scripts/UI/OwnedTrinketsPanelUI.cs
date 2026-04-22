@@ -8,8 +8,7 @@ namespace UI
 {
     /// <summary>
     /// 보유 중인 장식품 목록을 화면에 표시하는 UI 패널입니다.
-    /// 마우스 클릭/드래그를 통해 스크롤하려면 이 컴포넌트가 부착된 또는 부모의 
-    /// ScrollRect(Vertical) 컴포넌트에 이 패널의 contentContainer를 Content로 연결해주세요.
+    /// Object Pooling을 사용하여 매번 Instantiate/Destroy하지 않습니다.
     /// </summary>
     public class OwnedTrinketsPanelUI : MonoBehaviour, IEventListener<OwnedTrinketsUpdatedEvent>
     {
@@ -18,6 +17,7 @@ namespace UI
         [SerializeField] private OwnedTrinketCellUI cellPrefab;
 
         private readonly List<OwnedTrinketCellUI> _activeCells = new();
+        private readonly List<OwnedTrinketCellUI> _pooledCells = new();
 
         private void OnEnable()
         {
@@ -40,21 +40,36 @@ namespace UI
             if (GameManager.Instance == null || GameManager.Instance.Context == null) return;
             var ctx = GameManager.Instance.Context;
 
-            // Clear existing cells
-            foreach (var cell in _activeCells)
+            // 활성 셀을 풀로 반환
+            for (int i = _activeCells.Count - 1; i >= 0; i--)
             {
-                if (cell != null) Destroy(cell.gameObject);
+                var cell = _activeCells[i];
+                cell.gameObject.SetActive(false);
+                _pooledCells.Add(cell);
             }
             _activeCells.Clear();
 
-            // Instantiate new cells based on TrinketCounts
+            // TrinketCounts에 맞춰 셀 생성/재사용
             foreach (var (trinket, count) in ctx.TrinketCounts)
             {
-                var cell = Instantiate(cellPrefab, contentContainer);
+                var cell = GetOrCreateCell();
                 cell.Setup(trinket, count);
                 cell.gameObject.SetActive(true);
                 _activeCells.Add(cell);
             }
+        }
+
+        private OwnedTrinketCellUI GetOrCreateCell()
+        {
+            if (_pooledCells.Count > 0)
+            {
+                int lastIndex = _pooledCells.Count - 1;
+                var cell = _pooledCells[lastIndex];
+                _pooledCells.RemoveAt(lastIndex);
+                return cell;
+            }
+
+            return Instantiate(cellPrefab, contentContainer);
         }
     }
 }

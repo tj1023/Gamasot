@@ -18,4 +18,12 @@ MonoBehaviour:
     \uAC74\uC9C0\uBA74, \uBCF4\uC720 \uC7AC\uB8CC \uC911 \uB79C\uB364\uC73C\uB85C
     1\uAC1C\uB97C \uB0C4\uBE44\uC5D0 \uCD94\uAC00"
   maxAccumulationCount: 1
-  effectType: 11
+  effect:
+    rid: 8392392440219959371
+  references:
+    version: 2
+    RefIds:
+    - rid: 8392392440219959371
+      type: {class: SodaEffect, ns: Gameplay.TrinketEffects, asm: Assembly-CSharp}
+      data:
+        minScoopCount: 4

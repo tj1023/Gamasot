@@ -168,7 +168,7 @@ namespace Gameplay.Systems
         private void FixedUpdate()
         {
             var ctx = GameManager.Instance?.Context;
-            if (ctx is { HasPuddingEffect: true, IsPaused: false })
+            if (ctx is { IsPaused: false } && ctx.TrinketModifiers.HasPuddingEffect)
             {
                 Vector3 center = potBoundary.transform.position;
                 float pullForce = 0.6f; // 중심축으로 당기는 힘 (필요시 조절)

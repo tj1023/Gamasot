@@ -72,7 +72,7 @@ namespace Gameplay.Systems
 
             var ctx = GameManager.Instance?.Context;
             bool isScoopPhase = ctx is { CurrentPhase: GamePhase.OnScoop, IsPaused: false };
-            float currentRadius = scoopRadius * (ctx?.ScoopRadiusModifier ?? 1f);
+            float currentRadius = scoopRadius * (ctx?.TrinketModifiers.ScoopRadiusModifier ?? 1f);
 
             HandleCursorVisual(isInsidePot && isScoopPhase, worldPos, currentRadius);
 

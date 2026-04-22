@@ -17,4 +17,14 @@ MonoBehaviour:
   description: "\uBCF4\uC720\uC911\uC778 \uD76C\uADC0 \uC774\uC0C1 \uCE74\uB4DC 1\uC7A5
     \uBC1C\uACAC"
   maxAccumulationCount: 1
-  effectType: 3
+  effect:
+    rid: 8392392440219959369
+  references:
+    version: 2
+    RefIds:
+    - rid: 8392392440219959369
+      type: {class: DiscoverCardEffect, ns: Gameplay.TrinketEffects, asm: Assembly-CSharp}
+      data:
+        minRarity: 1
+        discoverCount: 1
+        ownedOnly: 1

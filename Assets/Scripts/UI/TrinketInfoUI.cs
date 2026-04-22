@@ -51,8 +51,11 @@ namespace UI
             {
                 selectionHighlight.SetActive(true);
             }
-            
-            OnSelected?.Invoke(_currentData);
+
+            // 중복 호출 방지: 콜백 실행 후 즉시 해제
+            var callback = OnSelected;
+            OnSelected = null;
+            callback?.Invoke(_currentData);
         }
     }
 }
