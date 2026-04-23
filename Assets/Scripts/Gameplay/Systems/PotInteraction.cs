@@ -29,6 +29,10 @@ namespace Gameplay.Systems
         private ContactFilter2D _ingredientFilter;
         private readonly List<RuntimeIngredient> _newHarvested = new();
         private readonly List<RuntimeIngredient> _potIngredients = new();
+        
+        // --- Outline ---
+        private readonly HashSet<IngredientEntity> _hoveredIngredients = new();
+        private readonly Color _outlineColor = new(0.5f, 1f, 0f, 1f);
 
         private void Awake()
         {
@@ -76,14 +80,75 @@ namespace Gameplay.Systems
 
             HandleCursorVisual(isInsidePot && isScoopPhase, worldPos, currentRadius);
 
+            // --- 아웃라인 처리 로직 ---
+            if (isInsidePot && isScoopPhase)
+            {
+                UpdateHoverOutlines(worldPos, currentRadius);
+            }
+            else
+            {
+                ClearHoverOutlines();
+            }
+
             // 솥 안에 방금 막 클릭이 발생했을 때
             if (isInsidePot && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 // 게임 매니저(컨텍스트) 체크하여 건지기 허용 상태인지 판별
                 if (ctx is { CurrentPhase: GamePhase.OnScoop, RemainScoopCount: > 0, IsPaused: false })
                 {
+                    ClearHoverOutlines(); // 스쿱 시작 시 아웃라인 해제
                     StartCoroutine(ScoopIngredientsAsync(worldPos, currentRadius, ctx));
                 }
+            }
+        }
+
+        private void UpdateHoverOutlines(Vector2 scoopPos, float currentRadius)
+        {
+            int count = Physics2D.OverlapCircle(scoopPos, currentRadius, _ingredientFilter, _overlapResults);
+            
+            HashSet<IngredientEntity> currentFrameHovered = new HashSet<IngredientEntity>();
+            
+            for (int i = 0; i < count; i++)
+            {
+                IngredientEntity node = _overlapResults[i].GetComponent<IngredientEntity>();
+                if (node != null && node.gameObject.activeInHierarchy)
+                {
+                    currentFrameHovered.Add(node);
+                    if (!_hoveredIngredients.Contains(node))
+                    {
+                        node.SetOutline(true, _outlineColor);
+                        _hoveredIngredients.Add(node);
+                    }
+                }
+            }
+
+            // 이전에 hover 상태였지만 이번 프레임에서 벗어난 것들 처리
+            _hoveredIngredients.RemoveWhere(node => 
+            {
+                if (!currentFrameHovered.Contains(node))
+                {
+                    if (node != null && node.gameObject.activeInHierarchy)
+                    {
+                        node.SetOutline(false, _outlineColor);
+                    }
+                    return true; // remove from hashset
+                }
+                return false; // keep in hashset
+            });
+        }
+
+        private void ClearHoverOutlines()
+        {
+            if (_hoveredIngredients.Count > 0)
+            {
+                foreach (var node in _hoveredIngredients)
+                {
+                    if (node != null && node.gameObject.activeInHierarchy)
+                    {
+                        node.SetOutline(false, _outlineColor);
+                    }
+                }
+                _hoveredIngredients.Clear();
             }
         }
 

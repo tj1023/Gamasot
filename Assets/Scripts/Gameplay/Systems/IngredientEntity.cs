@@ -22,6 +22,12 @@ namespace Gameplay.Systems
         private Rigidbody2D _rb;
         private SpriteRenderer _spriteRenderer;
         
+        // --- Outline ---
+        private GameObject _outlineObj;
+        private SpriteRenderer _outlineRenderer;
+        private static Material _outlineMaterial;
+        private const float OutlineThickness = 0.1f;
+
         public RuntimeIngredient RuntimeData { get; private set; }
         
         // 풀 회수 콜백용 (선택적 사용)
@@ -57,6 +63,55 @@ namespace Gameplay.Systems
             {
                 ScoreUIRegistry.Instance.RegisterIngredient(RuntimeData, transform);
             }
+
+            SetOutline(false, Color.white);
+        }
+
+        /// <summary>
+        /// 하이라이트(아웃라인)를 켜고 끕니다. Sliced 모드와 스케일에 관계없이 일정한 두께를 유지합니다.
+        /// </summary>
+        public void SetOutline(bool show, Color color)
+        {
+            if (!show)
+            {
+                if (_outlineObj != null) _outlineObj.SetActive(false);
+                return;
+            }
+
+            if (_outlineObj == null)
+            {
+                _outlineObj = new GameObject("Outline");
+                _outlineObj.transform.SetParent(transform);
+                
+                _outlineRenderer = _outlineObj.AddComponent<SpriteRenderer>();
+                
+                if (_outlineMaterial == null)
+                {
+                    Shader shader = Shader.Find("Custom/SpriteSolidColor");
+                    if (shader != null) _outlineMaterial = new Material(shader);
+                }
+                if (_outlineMaterial != null)
+                    _outlineRenderer.material = _outlineMaterial;
+            }
+
+            _outlineObj.SetActive(true);
+            _outlineObj.transform.localPosition = Vector3.zero;
+            _outlineObj.transform.localRotation = Quaternion.identity;
+
+            // 부모의 로컬 스케일에 반비례하게 설정하여 월드 스케일 1을 유지
+            Vector3 parentScale = transform.localScale;
+            float scaleX = Mathf.Abs(parentScale.x) > 0.001f ? parentScale.x : 1f;
+            float scaleY = Mathf.Abs(parentScale.y) > 0.001f ? parentScale.y : 1f;
+            _outlineObj.transform.localScale = new Vector3(1f / scaleX, 1f / scaleY, 1f);
+
+            // SpriteRenderer 속성 동기화
+            _outlineRenderer.sprite = _spriteRenderer.sprite;
+            _outlineRenderer.drawMode = _spriteRenderer.drawMode;
+            _outlineRenderer.sortingLayerID = _spriteRenderer.sortingLayerID;
+            _outlineRenderer.sortingOrder = _spriteRenderer.sortingOrder - 1; // 부모 뒤에 렌더링
+            _outlineRenderer.color = color;
+            _outlineRenderer.size = new Vector2(1f + (OutlineThickness * 1f) / scaleX, 1f + (OutlineThickness * 1f) / scaleY);
+
         }
 
         /// <summary>
@@ -66,7 +121,7 @@ namespace Gameplay.Systems
         private void FixedUpdate()
         {
             var ctx = GameManager.Instance?.Context;
-            if (ctx != null && ctx.IsPaused)
+            if (ctx is { IsPaused: true })
             {
                 _rb.linearVelocity = Vector2.zero;
                 _rb.angularVelocity = 0f;
@@ -111,6 +166,8 @@ namespace Gameplay.Systems
             {
                 ScoreUIRegistry.Instance.UnregisterIngredient(RuntimeData);
             }
+
+            SetOutline(false, Color.white);
         }
     }
 }
