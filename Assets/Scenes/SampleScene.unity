@@ -2223,6 +2223,7 @@ MonoBehaviour:
   ingredientLayer:
     serializedVersion: 2
     m_Bits: 8
+  scoopParticlePrefab: {fileID: 9181406481490086555, guid: 3796df036f6b1e24aa998a146be57ac2, type: 3}
 --- !u!1 &1106813141
 GameObject:
   m_ObjectHideFlags: 0

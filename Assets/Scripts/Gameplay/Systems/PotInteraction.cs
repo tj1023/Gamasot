@@ -1,9 +1,11 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using Core;
 using Data;
 using Interfaces;
+using UnityEngine.Pool;
 
 // FoodIngredientData 및 기타 컨텍스트 연동을 위함
 
@@ -23,6 +25,7 @@ namespace Gameplay.Systems
         [SerializeField] private Transform cursorVisual;
         [SerializeField] private float scoopRadius = 2f;
         [SerializeField] private LayerMask ingredientLayer;
+        [SerializeField] private ParticleSystem scoopParticlePrefab;
 
         private Camera _mainCam;
         private Collider2D[] _overlapResults;
@@ -33,6 +36,9 @@ namespace Gameplay.Systems
         // --- Outline ---
         private readonly HashSet<IngredientEntity> _hoveredIngredients = new();
         private readonly Color _outlineColor = new(0.5f, 1f, 0f, 1f);
+
+        // --- Particle Pool ---
+        private ObjectPool<ParticleSystem> _particlePool;
 
         private void Awake()
         {
@@ -52,6 +58,18 @@ namespace Gameplay.Systems
                 // visual scale을 radius 크기에 맞게 조절 (원형 스프라이트가 기본 1x1 단위라고 가정)
                 cursorVisual.localScale = new Vector3(scoopRadius * 2f, scoopRadius * 2f, 1f);
                 cursorVisual.gameObject.SetActive(false);
+            }
+
+            if (scoopParticlePrefab != null)
+            {
+                _particlePool = new ObjectPool<ParticleSystem>(
+                    createFunc: () => Instantiate(scoopParticlePrefab, transform),
+                    actionOnGet: (ps) => ps.gameObject.SetActive(true),
+                    actionOnRelease: (ps) => ps.gameObject.SetActive(false),
+                    actionOnDestroy: (ps) => Destroy(ps.gameObject),
+                    defaultCapacity: 10,
+                    maxSize: 50
+                );
             }
         }
 
@@ -176,7 +194,7 @@ namespace Gameplay.Systems
             }
         }
 
-        private System.Collections.IEnumerator ScoopIngredientsAsync(Vector2 scoopPos, float currentRadius, GameContext ctx)
+        private IEnumerator ScoopIngredientsAsync(Vector2 scoopPos, float currentRadius, GameContext ctx)
         {
             _isProcessingScoop = true;
             ctx.IsPaused = true;
@@ -200,6 +218,8 @@ namespace Gameplay.Systems
             
             if (_newHarvested.Count > 0)
             {
+                yield return StartCoroutine(PlayScoopAnimationAsync(overlappingNodes));
+
                 yield return StartCoroutine(ApplyScoopSynergiesAsync(_newHarvested));
 
                 // 연출 완료 후 UI로 수거
@@ -219,7 +239,38 @@ namespace Gameplay.Systems
             HandleCursorVisual(true, scoopPos, currentRadius); // 다시 보이기 (마우스가 여전히 솥 안쪽이라면)
         }
 
-        private System.Collections.IEnumerator ApplyScoopSynergiesAsync(List<RuntimeIngredient> newlyScooped)
+        private IEnumerator PlayScoopAnimationAsync(List<IngredientEntity> nodes)
+        {
+            foreach (var t in nodes)
+            {
+                if (t == null) continue;
+                if (_particlePool == null) continue;
+                
+                var ps = _particlePool.Get();
+                ps.transform.position = t.transform.position;
+                ps.Play();
+                StartCoroutine(ReleaseParticleRoutine(ps));
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator ReleaseParticleRoutine(ParticleSystem ps)
+        {
+            if (ps == null) yield break;
+            
+            while (ps != null && ps.IsAlive(true))
+            {
+                yield return null;
+            }
+            
+            if (ps != null && _particlePool != null)
+            {
+                _particlePool.Release(ps);
+            }
+        }
+
+        private IEnumerator ApplyScoopSynergiesAsync(List<RuntimeIngredient> newlyScooped)
         {
             var scoopContext = GameManager.Instance.Context;
 
