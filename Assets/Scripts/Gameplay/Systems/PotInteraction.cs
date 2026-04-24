@@ -45,8 +45,8 @@ namespace Gameplay.Systems
             _mainCam = Camera.main;
             
             // GC 발생을 차단하기 위해, 배열을 생성하여 재사용
-            // size = 한 번에 건지는 최대 수량 가정
-            _overlapResults = new Collider2D[10];
+            // size = 넉넉하게 50으로 늘려서 누락 방지
+            _overlapResults = new Collider2D[50];
             
             // 필터 초기화
             _ingredientFilter = new ContactFilter2D();
@@ -132,11 +132,8 @@ namespace Gameplay.Systems
                 if (node != null && node.gameObject.activeInHierarchy)
                 {
                     currentFrameHovered.Add(node);
-                    if (!_hoveredIngredients.Contains(node))
-                    {
-                        node.SetOutline(true, _outlineColor);
-                        _hoveredIngredients.Add(node);
-                    }
+                    node.SetOutline(true, _outlineColor);
+                    _hoveredIngredients.Add(node);
                 }
             }
 
@@ -234,6 +231,7 @@ namespace Gameplay.Systems
                 NewHarvestedItems = _newHarvested
             });
 
+            ClearHoverOutlines();
             _isProcessingScoop = false;
             ctx.IsPaused = false;
             HandleCursorVisual(true, scoopPos, currentRadius); // 다시 보이기 (마우스가 여전히 솥 안쪽이라면)
