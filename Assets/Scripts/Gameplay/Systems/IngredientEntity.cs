@@ -39,6 +39,8 @@ namespace Gameplay.Systems
         private Coroutine _popRoutine;
         private Vector3 _defaultScale = Vector3.one;
 
+        private Vector3 _potCenter;
+
         public RuntimeIngredient RuntimeData { get; private set; }
         
         // 풀 회수 콜백용 (선택적 사용)
@@ -53,8 +55,10 @@ namespace Gameplay.Systems
             _defaultScale = transform.localScale;
         }
 
-        public void Initialize(FoodIngredientData data)
+        public void Initialize(FoodIngredientData data, Vector3 potCenter)
         {
+            _potCenter = potCenter;
+
             // 인스턴스마다 독립적인 런타임 데이터 생성
             RuntimeData = new RuntimeIngredient(data);
             
@@ -199,6 +203,12 @@ namespace Gameplay.Systems
                 _rb.linearVelocity = Vector2.zero;
                 _rb.angularVelocity = 0f;
                 return;
+            }
+
+            if (ctx != null && ctx.TrinketModifiers.HasPuddingEffect)
+            {
+                Vector2 dir = (_potCenter - transform.position).normalized;
+                _rb.AddForce(dir * 0.6f, ForceMode2D.Force);
             }
 
             float currentSpeed = _rb.linearVelocity.magnitude;

@@ -35,6 +35,7 @@ namespace Gameplay.Systems
         
         // --- Outline ---
         private readonly HashSet<IngredientEntity> _hoveredIngredients = new();
+        private readonly HashSet<IngredientEntity> _currentFrameHovered = new();
         private readonly Color _outlineColor = new(0.5f, 1f, 0f, 1f);
 
         // --- Particle Pool ---
@@ -124,14 +125,14 @@ namespace Gameplay.Systems
         {
             int count = Physics2D.OverlapCircle(scoopPos, currentRadius, _ingredientFilter, _overlapResults);
             
-            HashSet<IngredientEntity> currentFrameHovered = new HashSet<IngredientEntity>();
+            _currentFrameHovered.Clear();
             
             for (int i = 0; i < count; i++)
             {
                 IngredientEntity node = _overlapResults[i].GetComponent<IngredientEntity>();
                 if (node != null && node.gameObject.activeInHierarchy)
                 {
-                    currentFrameHovered.Add(node);
+                    _currentFrameHovered.Add(node);
                     node.SetOutline(true, _outlineColor);
                     _hoveredIngredients.Add(node);
                 }
@@ -140,7 +141,7 @@ namespace Gameplay.Systems
             // 이전에 hover 상태였지만 이번 프레임에서 벗어난 것들 처리
             _hoveredIngredients.RemoveWhere(node => 
             {
-                if (!currentFrameHovered.Contains(node))
+                if (!_currentFrameHovered.Contains(node))
                 {
                     if (node != null && node.gameObject.activeInHierarchy)
                     {

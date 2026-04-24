@@ -24,7 +24,7 @@ namespace Gameplay.Systems
         private ObjectPool<IngredientEntity> _ingredientPool;
         
         // 현재 솥(Pot)에 존재하는 활성화된 재료 노드 리스트
-        public List<IngredientEntity> ActiveIngredients { get; private set; } = new();
+        public List<IngredientEntity> ActiveIngredients { get; } = new();
 
         private void Awake()
         {
@@ -127,7 +127,7 @@ namespace Gameplay.Systems
             Vector2 randomPoint = Random.insideUnitCircle * (potBoundary.Radius * 0.8f);
             
             ingredient.transform.position = potBoundary.transform.position + (Vector3)randomPoint;
-            ingredient.Initialize(data);
+            ingredient.Initialize(data, potBoundary.transform.position);
         }
 
         /// <summary>
@@ -163,25 +163,6 @@ namespace Gameplay.Systems
             }
 
             ListPool<int>.Release(indices);
-        }
-
-        private void FixedUpdate()
-        {
-            var ctx = GameManager.Instance?.Context;
-            if (ctx is { IsPaused: false } && ctx.TrinketModifiers.HasPuddingEffect)
-            {
-                Vector3 center = potBoundary.transform.position;
-                float pullForce = 0.6f; // 중심축으로 당기는 힘 (필요시 조절)
-                
-                foreach (var ingredient in ActiveIngredients)
-                {
-                    if (ingredient.TryGetComponent<Rigidbody2D>(out var rb))
-                    {
-                        Vector2 dir = (center - ingredient.transform.position).normalized;
-                        rb.AddForce(dir * pullForce, ForceMode2D.Force);
-                    }
-                }
-            }
         }
     }
 }
