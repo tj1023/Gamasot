@@ -234,7 +234,29 @@ namespace Gameplay.Systems
             ClearHoverOutlines();
             _isProcessingScoop = false;
             ctx.IsPaused = false;
-            HandleCursorVisual(true, scoopPos, currentRadius); // 다시 보이기 (마우스가 여전히 솥 안쪽이라면)
+            
+            // 마지막 스쿱 후 정산 페이즈 등 다른 페이즈로 넘어가지 않은 경우에만 커서를 다시 표시
+            if (ctx is { CurrentPhase: GamePhase.OnScoop })
+            {
+                if (Mouse.current != null)
+                {
+                    Vector2 mousePos2D = Mouse.current.position.ReadValue();
+                    Vector3 mousePos = new Vector3(mousePos2D.x, mousePos2D.y, 0f)
+                    {
+                        z = -_mainCam.transform.position.z
+                    };
+                    Vector2 worldPos = _mainCam.ScreenToWorldPoint(mousePos);
+                    float distToPotCenter = Vector2.Distance(worldPos, potBoundary.transform.position);
+                    bool isInsidePot = distToPotCenter <= potBoundary.Radius;
+                    
+                    HandleCursorVisual(isInsidePot, worldPos, currentRadius);
+                }
+            }
+            else
+            {
+                // 페이즈가 넘어갔다면 무조건 커서를 숨김
+                HandleCursorVisual(false, scoopPos, currentRadius);
+            }
         }
 
         private IEnumerator PlayScoopAnimationAsync(List<IngredientEntity> nodes)
