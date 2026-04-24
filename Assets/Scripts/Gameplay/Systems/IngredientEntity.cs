@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using Core;
 using Data;
+using Interfaces;
 using UI;
 
 namespace Gameplay.Systems
@@ -9,7 +12,7 @@ namespace Gameplay.Systems
     /// 솥 내부를 떠다니는 재료 오브젝트의 행동을 제어합니다.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
-    public class IngredientEntity : MonoBehaviour
+    public class IngredientEntity : MonoBehaviour, IEventListener<IngredientScoreChangedEvent>, IEventListener<PlayScoreTrailEvent>
     {
         [Header("Movement Settings")]
         [SerializeField] private float minSpeed = 1f;
@@ -18,6 +21,10 @@ namespace Gameplay.Systems
         [Header("Rotation Settings")]
         [SerializeField] private float minRotationSpeed = 20f;
         [SerializeField] private float maxRotationSpeed = 120f;
+
+        [Header("Animation Settings")]
+        [SerializeField] private float popScale = 1.2f;
+        [SerializeField] private float popDuration = 0.15f;
         
         private Rigidbody2D _rb;
         private SpriteRenderer _spriteRenderer;
@@ -27,6 +34,10 @@ namespace Gameplay.Systems
         private SpriteRenderer _outlineRenderer;
         private static Material _outlineMaterial;
         private const float OutlineThickness = 0.1f;
+
+        // --- Animation ---
+        private Coroutine _popRoutine;
+        private Vector3 _defaultScale = Vector3.one;
 
         public RuntimeIngredient RuntimeData { get; private set; }
         
@@ -39,6 +50,7 @@ namespace Gameplay.Systems
             _spriteRenderer = GetComponent<SpriteRenderer>();
             
             _rb.gravityScale = 0f;
+            _defaultScale = transform.localScale;
         }
 
         public void Initialize(FoodIngredientData data)
@@ -65,6 +77,67 @@ namespace Gameplay.Systems
             }
 
             SetOutline(false, Color.white);
+            transform.localScale = _defaultScale;
+
+            // 이벤트 구독
+            EventBus<IngredientScoreChangedEvent>.Subscribe(this);
+            EventBus<PlayScoreTrailEvent>.Subscribe(this);
+        }
+
+        public void OnEvent(IngredientScoreChangedEvent eventData)
+        {
+            if (eventData.Ingredient == RuntimeData)
+            {
+                if (eventData.NewScore != eventData.OldScore && gameObject.activeInHierarchy)
+                {
+                    PlayPop();
+                }
+            }
+        }
+
+        public void OnEvent(PlayScoreTrailEvent eventData)
+        {
+            if (eventData.SourceIngredient == RuntimeData && gameObject.activeInHierarchy)
+            {
+                PlayPop();
+            }
+        }
+
+        private void PlayPop()
+        {
+            if (_popRoutine != null)
+            {
+                StopCoroutine(_popRoutine);
+            }
+            _popRoutine = StartCoroutine(PopRoutine());
+        }
+
+        private IEnumerator PopRoutine()
+        {
+            float elapsed = 0f;
+            Vector3 targetScale = _defaultScale * popScale;
+
+            // 커지기
+            while (elapsed < popDuration * 0.5f)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / (popDuration * 0.5f);
+                transform.localScale = Vector3.Lerp(_defaultScale, targetScale, t);
+                yield return null;
+            }
+
+            elapsed = 0f;
+            // 작아지기
+            while (elapsed < popDuration * 0.5f)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / (popDuration * 0.5f);
+                transform.localScale = Vector3.Lerp(targetScale, _defaultScale, t);
+                yield return null;
+            }
+
+            transform.localScale = _defaultScale;
+            _popRoutine = null;
         }
 
         /// <summary>
@@ -158,6 +231,17 @@ namespace Gameplay.Systems
 
         private void OnDisable()
         {
+            // 이벤트 해제
+            EventBus<IngredientScoreChangedEvent>.Unsubscribe(this);
+            EventBus<PlayScoreTrailEvent>.Unsubscribe(this);
+
+            if (_popRoutine != null)
+            {
+                StopCoroutine(_popRoutine);
+                _popRoutine = null;
+            }
+            transform.localScale = _defaultScale;
+
             // 오브젝트가 비활성화될 때 초기화 처리
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
@@ -168,6 +252,12 @@ namespace Gameplay.Systems
             }
 
             SetOutline(false, Color.white);
+        }
+        
+        private void OnDestroy()
+        {
+            EventBus<IngredientScoreChangedEvent>.Unsubscribe(this);
+            EventBus<PlayScoreTrailEvent>.Unsubscribe(this);
         }
     }
 }
