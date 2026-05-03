@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-
 using Core;
 
 namespace Editor
@@ -14,11 +14,20 @@ namespace Editor
     [CustomPropertyDrawer(typeof(SubclassSelectorAttribute))]
     public class SubclassSelectorDrawer : PropertyDrawer
     {
+        // ── 타입별 캐시 ─────────────────────────────────
+        private static readonly Dictionary<Type, (Type[] types, GUIContent[] labels)> STypeCache = new();
+
+        /// <summary>
+        /// 도메인 리로드 시 캐시 자동 초기화
+        /// </summary>
+        [InitializeOnLoadMethod]
+        private static void ClearCacheOnReload() => STypeCache.Clear();
+
+        // ── OnGUI ───────────────────────────────────────
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
-            
-            // 필드의 기본 타입(인터페이스 또는 부모 클래스) 획득
+
             Type fieldType = GetFieldType(property);
             if (fieldType == null)
             {
@@ -27,108 +36,198 @@ namespace Editor
                 return;
             }
 
-            // 부모 타입(인터페이스/추상클래스)을 상속받는 모든 일반 클래스(구현체) 검색
-            var derivedTypes = TypeCache.GetTypesDerivedFrom(fieldType)
-                .Where(t => !t.IsAbstract && !t.IsInterface && !t.IsGenericType && t.IsDefined(typeof(SerializableAttribute), false))
-                .ToArray();
+            // 캐시에서 파생 타입 목록 및 라벨 가져오기
+            var (derivedTypes, typeLabels) = GetOrBuildCache(fieldType);
 
-            // 현재 할당된 타입 (없으면 null)
-            Type currentType = null;
-            if (!string.IsNullOrEmpty(property.managedReferenceFullTypename))
-            {
-                var parts = property.managedReferenceFullTypename.Split(' ');
-                if (parts.Length == 2)
-                {
-                    currentType = Type.GetType($"{parts[1]}, {parts[0]}");
-                }
-            }
-
-            // 드롭다운에 표시할 이름 목록
-            GUIContent[] typeNames = new GUIContent[derivedTypes.Length + 1];
-            typeNames[0] = new GUIContent("<Null> (비우기)");
+            // 현재 할당된 타입 확인
+            Type currentType = ResolveCurrentType(property);
             int currentIndex = 0;
 
-            for (int i = 0; i < derivedTypes.Length; i++)
+            // Missing type 감지
+            bool isMissing = currentType == null 
+                             && !string.IsNullOrEmpty(property.managedReferenceFullTypename);
+
+            if (currentType != null)
             {
-                typeNames[i + 1] = new GUIContent(derivedTypes[i].Name);
-                if (currentType == derivedTypes[i])
+                for (int i = 0; i < derivedTypes.Length; i++)
                 {
-                    currentIndex = i + 1;
+                    if (currentType == derivedTypes[i])
+                    {
+                        currentIndex = i + 1;
+                        break;
+                    }
                 }
             }
 
+            // ── Foldout + Popup ──
             Rect popupRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+            property.isExpanded = EditorGUI.Foldout(
+                new Rect(popupRect.x, popupRect.y, EditorGUIUtility.labelWidth, popupRect.height),
+                property.isExpanded, label, true);
 
-            // Foldout + Popup rendering
-            property.isExpanded = EditorGUI.Foldout(new Rect(popupRect.x, popupRect.y, EditorGUIUtility.labelWidth, popupRect.height), property.isExpanded, label, true);
-            
-            Rect dropdownRect = new Rect(popupRect.x + EditorGUIUtility.labelWidth, popupRect.y, popupRect.width - EditorGUIUtility.labelWidth, popupRect.height);
-            int newIndex = EditorGUI.Popup(dropdownRect, currentIndex, typeNames);
+            Rect dropdownRect = new Rect(
+                popupRect.x + EditorGUIUtility.labelWidth, popupRect.y,
+                popupRect.width - EditorGUIUtility.labelWidth, popupRect.height);
 
-            if (newIndex != currentIndex)
+            // Missing type 경고 표시
+            if (isMissing)
             {
-                property.managedReferenceValue = newIndex == 0 ? null : Activator.CreateInstance(derivedTypes[newIndex - 1]);
-                property.serializedObject.ApplyModifiedProperties();
-                // Removed unsafe Update() and Event.current.Use() which cause invalid GC handle
+                var warningStyle = new GUIStyle(EditorStyles.popup);
+                warningStyle.normal.textColor = Color.red;
+                EditorGUI.LabelField(dropdownRect, $"⚠ Missing: {property.managedReferenceFullTypename}", warningStyle);
+            }
+            else
+            {
+                int newIndex = EditorGUI.Popup(dropdownRect, currentIndex, typeLabels);
+                if (newIndex != currentIndex)
+                {
+                    property.managedReferenceValue = newIndex == 0
+                        ? null
+                        : Activator.CreateInstance(derivedTypes[newIndex - 1]);
+                    property.serializedObject.ApplyModifiedProperties();
+                }
             }
 
-            // 내부 필드(수치 입력 등) 렌더링
+            // ── 자식 프로퍼티 렌더링 ──
             if (property.isExpanded && currentType != null && property.hasVisibleChildren)
             {
                 EditorGUI.indentLevel++;
-                Rect propertyRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-                
-                SerializedProperty iterator = property.Copy();
-                bool enterChildren = true;
-                
-                while (iterator.NextVisible(enterChildren))
+                Rect childRect = new Rect(
+                    position.x,
+                    position.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing,
+                    position.width,
+                    EditorGUIUtility.singleLineHeight);
+
+                ForEachDirectChild(property, child =>
                 {
-                    enterChildren = false;
-
-                    // 부모 프로퍼티 경로와 다르면 자식이 아님
-                    if (!iterator.propertyPath.StartsWith(property.propertyPath + "."))
-                        break;
-
-                    float childHeight = EditorGUI.GetPropertyHeight(iterator, true);
-                    propertyRect.height = childHeight;
-                    EditorGUI.PropertyField(propertyRect, iterator, true);
-                    propertyRect.y += childHeight + EditorGUIUtility.standardVerticalSpacing;
-                }
+                    float childHeight = EditorGUI.GetPropertyHeight(child, true);
+                    childRect.height = childHeight;
+                    EditorGUI.PropertyField(childRect, child, true);
+                    childRect.y += childHeight + EditorGUIUtility.standardVerticalSpacing;
+                });
                 EditorGUI.indentLevel--;
             }
-            
+
             EditorGUI.EndProperty();
         }
 
+        // ── GetPropertyHeight ───────────────────────────
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             float height = EditorGUIUtility.singleLineHeight;
-            
-            if (property.isExpanded && !string.IsNullOrEmpty(property.managedReferenceFullTypename) && property.hasVisibleChildren)
+
+            if (property.isExpanded
+                && !string.IsNullOrEmpty(property.managedReferenceFullTypename)
+                && property.hasVisibleChildren)
             {
-                SerializedProperty iterator = property.Copy();
-                bool enterChildren = true;
-                while (iterator.NextVisible(enterChildren))
+                ForEachDirectChild(property, child =>
                 {
-                    enterChildren = false;
-                    
-                    if (!iterator.propertyPath.StartsWith(property.propertyPath + "."))
-                        break;
-                        
-                    height += EditorGUI.GetPropertyHeight(iterator, true) + EditorGUIUtility.standardVerticalSpacing;
-                }
+                    height += EditorGUI.GetPropertyHeight(child, true)
+                              + EditorGUIUtility.standardVerticalSpacing;
+                });
             }
-            
+
             return height;
         }
 
-        private Type GetFieldType(SerializedProperty property)
+        // ── 유틸리티 ────────────────────────────────────
+
+        /// <summary>
+        /// fieldType에서 파생된 타입 목록과 드롭다운 라벨을 캐시하여 반환합니다.
+        /// </summary>
+        private static (Type[] types, GUIContent[] labels) GetOrBuildCache(Type fieldType)
         {
-            var parts = property.managedReferenceFieldTypename.Split(' ');
-            if (parts.Length == 2)
+            if (STypeCache.TryGetValue(fieldType, out var cached))
+                return cached;
+
+            var derivedTypes = TypeCache.GetTypesDerivedFrom(fieldType)
+                .Where(t => !t.IsAbstract && !t.IsInterface && !t.IsGenericType)
+                .OrderBy(t => t.Name)
+                .ToArray();
+
+            var labels = new GUIContent[derivedTypes.Length + 1];
+            labels[0] = new GUIContent("<Null> (비우기)");
+            for (int i = 0; i < derivedTypes.Length; i++)
             {
-                return Type.GetType($"{parts[1]}, {parts[0]}");
+                labels[i + 1] = new GUIContent(derivedTypes[i].Name);
             }
+
+            STypeCache[fieldType] = (derivedTypes, labels);
+            return (derivedTypes, labels);
+        }
+
+        /// <summary>
+        /// 현재 SerializeReference 필드에 할당된 타입을 해석합니다.
+        /// Type.GetType 실패 시 AppDomain 어셈블리 전체를 검색합니다.
+        /// </summary>
+        private static Type ResolveCurrentType(SerializedProperty property)
+        {
+            string fullTypeName = property.managedReferenceFullTypename;
+            if (string.IsNullOrEmpty(fullTypeName)) return null;
+
+            var parts = fullTypeName.Split(' ');
+            if (parts.Length != 2) return null;
+
+            string assemblyName = parts[0];
+            string typeName = parts[1];
+
+            // 빠른 경로
+            Type result = Type.GetType($"{typeName}, {assemblyName}");
+            if (result != null) return result;
+
+            // Fallback: asmdef 경계를 넘는 경우
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.GetName().Name == assemblyName)
+                {
+                    result = asm.GetType(typeName);
+                    if (result != null) return result;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// property의 직계 자식 프로퍼티만 순회합니다.
+        /// OnGUI/GetPropertyHeight 양쪽에서 재사용됩니다.
+        /// </summary>
+        private static void ForEachDirectChild(SerializedProperty property, Action<SerializedProperty> action)
+        {
+            string parentPath = property.propertyPath + ".";
+            SerializedProperty iterator = property.Copy();
+            bool enterChildren = true;
+
+            while (iterator.NextVisible(enterChildren))
+            {
+                enterChildren = false;
+                if (!iterator.propertyPath.StartsWith(parentPath))
+                    break;
+                action(iterator);
+            }
+        }
+
+        /// <summary>
+        /// SerializedProperty에서 필드의 기본 타입(인터페이스/부모 클래스)을 추출합니다.
+        /// </summary>
+        private static Type GetFieldType(SerializedProperty property)
+        {
+            string fullTypeName = property.managedReferenceFieldTypename;
+            if (string.IsNullOrEmpty(fullTypeName)) return null;
+
+            var parts = fullTypeName.Split(' ');
+            if (parts.Length != 2) return null;
+
+            Type result = Type.GetType($"{parts[1]}, {parts[0]}");
+            if (result != null) return result;
+
+            // Fallback
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.GetName().Name == parts[0])
+                    return asm.GetType(parts[1]);
+            }
+
             return null;
         }
     }
