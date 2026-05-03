@@ -18,7 +18,8 @@ MonoBehaviour:
   rarity: 2
   sprite: {fileID: -5145311920877871996, guid: 2c4e386772cb36445b9fffb662f8d0af, type: 3}
   count: 2
-  desc: 
+  desc: "\uC815\uC0B0 \uC2DC, \uC810\uC218\uAC00 \uAC00\uC7A5 \uB192\uC740 \uC7AC\uB8CC
+    1\uAC1C\uC758 \uC810\uC218\uB97C \uD68D\uB4DD"
   synergies:
   - trigger:
       rid: 8392392052938375256

@@ -26,6 +26,9 @@ namespace Gameplay.Systems
         [SerializeField] private float popScale = 1.2f;
         [SerializeField] private float popDuration = 0.15f;
         
+        [Header("Outline Settings")]
+        [SerializeField] private Shader outlineShader;
+        
         private Rigidbody2D _rb;
         private SpriteRenderer _spriteRenderer;
         
@@ -162,10 +165,9 @@ namespace Gameplay.Systems
                 
                 _outlineRenderer = _outlineObj.AddComponent<SpriteRenderer>();
                 
-                if (_outlineMaterial == null)
+                if (_outlineMaterial == null && outlineShader != null)
                 {
-                    Shader shader = Shader.Find("Custom/SpriteSolidColor");
-                    if (shader != null) _outlineMaterial = new Material(shader);
+                    _outlineMaterial = new Material(outlineShader);
                 }
                 if (_outlineMaterial != null)
                     _outlineRenderer.material = _outlineMaterial;

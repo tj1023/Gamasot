@@ -173,3 +173,6 @@ MonoBehaviour:
   maxSpeed: 0.5
   minRotationSpeed: 1
   maxRotationSpeed: 20
+  popScale: 1.2
+  popDuration: 0.15
+  outlineShader: {fileID: 4800000, guid: 5a0e65d3d1da5b1448b371afc2f6f41f, type: 3}
