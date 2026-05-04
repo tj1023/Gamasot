@@ -26,6 +26,7 @@ MonoBehaviour:
     - rid: 8392392052938375245
   isAdvanced: 0
   advancedBaseScore: 20
+  advancedDesc: "\uC815\uC0B0 \uC2DC, \uC721\uB958 1\uAC1C\uC758 \uC810\uC218 +20"
   advancedSynergies:
   - trigger:
       rid: 8392392052938375269

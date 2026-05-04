@@ -34,7 +34,7 @@ namespace Gameplay.Synergies
             if (candidates.Count > 0)
             {
                 int randomIndex = UnityEngine.Random.Range(0, candidates.Count);
-                return new UpgradeIngredientCommand(candidates[randomIndex]);
+                return new UpgradeIngredientCommand(source, candidates[randomIndex]);
             }
             return null;
         }

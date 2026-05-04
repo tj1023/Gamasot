@@ -35,11 +35,11 @@ namespace Data
             }
         }
 
-        public RuntimeIngredient(FoodIngredientData data)
+        public RuntimeIngredient(FoodIngredientData data, bool forceAdvanced = false)
         {
             OriginalData = data;
-            IsAdvanced = data.isAdvanced;
-            _currentScore = data.ActiveBaseScore;
+            IsAdvanced = forceAdvanced || data.isAdvanced;
+            _currentScore = IsAdvanced ? data.advancedBaseScore : data.baseScore;
         }
         
         public List<SynergyData> ActiveSynergies => IsAdvanced ? OriginalData.advancedSynergies : OriginalData.synergies;
@@ -49,7 +49,16 @@ namespace Data
             if (IsAdvanced) return;
             
             IsAdvanced = true;
-            CurrentScore = OriginalData.advancedBaseScore;
+            int oldScore = _currentScore;
+            _currentScore = OriginalData.advancedBaseScore;
+
+            // 점수 변동이 없더라도, 고급 변환 시각적 갱신을 위해 이벤트를 강제 발행
+            EventBus<IngredientScoreChangedEvent>.Publish(new IngredientScoreChangedEvent
+            {
+                Ingredient = this,
+                OldScore = oldScore,
+                NewScore = _currentScore
+            });
         }
     }
 }

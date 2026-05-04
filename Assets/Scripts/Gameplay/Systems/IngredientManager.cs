@@ -126,8 +126,11 @@ namespace Gameplay.Systems
             // 원형 경계의 가장자리에 끼이지 않도록 반지름의 80~90% 내에만 스폰 되게 처리.
             Vector2 randomPoint = Random.insideUnitCircle * (potBoundary.Radius * 0.8f);
             
+            // 10% 확률로 고급 스폰
+            bool isAdvanced = Random.value < 0.1f;
+            
             ingredient.transform.position = potBoundary.transform.position + (Vector3)randomPoint;
-            ingredient.Initialize(data, potBoundary.transform.position);
+            ingredient.Initialize(data, potBoundary.transform.position, isAdvanced);
         }
 
         /// <summary>
@@ -157,6 +160,7 @@ namespace Gameplay.Systems
                 if (!ingredient.RuntimeData.IsAdvanced)
                 {
                     ingredient.RuntimeData.TransformToAdvanced();
+                    ingredient.UpdateOutlineVisual();
                     transformed++;
                     if (transformed >= count) break;
                 }

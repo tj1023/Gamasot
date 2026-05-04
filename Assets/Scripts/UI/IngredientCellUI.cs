@@ -23,6 +23,10 @@ namespace UI
         [SerializeField] private float popScale = 1.2f;
         [SerializeField] private float popDuration = 0.15f;
 
+        [Header("Advanced Visual")]
+        [SerializeField] private Color advancedScoreColor = new Color(1f, 0.84f, 0f, 1f);
+        private Color _defaultScoreColor;
+
         private RuntimeIngredient _ingredient;
         private Coroutine _popRoutine;
         private Vector3 _defaultScale = Vector3.one;
@@ -30,6 +34,7 @@ namespace UI
         private void Awake()
         {
             _defaultScale = transform.localScale;
+            if (scoreText != null) _defaultScoreColor = scoreText.color;
         }
 
         public void Bind(RuntimeIngredient ingredient)
@@ -49,6 +54,11 @@ namespace UI
             else
             {
                 if (icon != null) icon.enabled = false;
+            }
+
+            if (scoreText != null)
+            {
+                scoreText.color = ingredient.IsAdvanced ? advancedScoreColor : _defaultScoreColor;
             }
 
             UpdateScore(ingredient.CurrentScore);
@@ -92,6 +102,11 @@ namespace UI
             // 이 셀이 가리키는 재료의 점수 변경 이벤트인지 확인
             if (eventData.Ingredient == _ingredient)
             {
+                if (scoreText != null)
+                {
+                    scoreText.color = _ingredient.IsAdvanced ? advancedScoreColor : _defaultScoreColor;
+                }
+
                 UpdateScore(eventData.NewScore);
                 
                 // 점수 상승 시 팝 애니메이션

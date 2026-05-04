@@ -58,12 +58,16 @@ namespace Gameplay.Systems
             _defaultScale = transform.localScale;
         }
 
-        public void Initialize(FoodIngredientData data, Vector3 potCenter)
+        private bool _isHovered;
+        private Color _hoverColor;
+        private static readonly Color AdvancedOutlineColor = new Color(1f, 0.84f, 0f, 1f); // Gold
+
+        public void Initialize(FoodIngredientData data, Vector3 potCenter, bool isAdvanced = false)
         {
             _potCenter = potCenter;
 
             // 인스턴스마다 독립적인 런타임 데이터 생성
-            RuntimeData = new RuntimeIngredient(data);
+            RuntimeData = new RuntimeIngredient(data, isAdvanced);
             
             // 데이터 기반 비주얼 갱신 (예시: ScriptableObject의 스프라이트 복사)
             if (data.sprite != null)
@@ -83,7 +87,8 @@ namespace Gameplay.Systems
                 ScoreUIRegistry.Instance.RegisterIngredient(RuntimeData, transform);
             }
 
-            SetOutline(false, Color.white);
+            _isHovered = false;
+            UpdateOutlineVisual();
             transform.localScale = _defaultScale;
 
             // 이벤트 구독
@@ -148,9 +153,35 @@ namespace Gameplay.Systems
         }
 
         /// <summary>
-        /// 하이라이트(아웃라인)를 켜고 끕니다. Sliced 모드와 스케일에 관계없이 일정한 두께를 유지합니다.
+        /// 하이라이트(아웃라인) 호버 상태를 설정하고 비주얼을 갱신합니다.
         /// </summary>
-        public void SetOutline(bool show, Color color)
+        public void SetHoverOutline(bool isHovered, Color color)
+        {
+            _isHovered = isHovered;
+            _hoverColor = color;
+            UpdateOutlineVisual();
+        }
+
+        public void UpdateOutlineVisual()
+        {
+            if (_isHovered)
+            {
+                ApplyOutline(true, _hoverColor);
+            }
+            else if (RuntimeData != null && RuntimeData.IsAdvanced)
+            {
+                ApplyOutline(true, AdvancedOutlineColor);
+            }
+            else
+            {
+                ApplyOutline(false, Color.white);
+            }
+        }
+
+        /// <summary>
+        /// 실제 아웃라인 렌더러를 켜고 끕니다. Sliced 모드와 스케일에 관계없이 일정한 두께를 유지합니다.
+        /// </summary>
+        private void ApplyOutline(bool show, Color color)
         {
             if (!show)
             {
@@ -263,7 +294,8 @@ namespace Gameplay.Systems
                 ScoreUIRegistry.Instance.UnregisterIngredient(RuntimeData);
             }
 
-            SetOutline(false, Color.white);
+            _isHovered = false;
+            ApplyOutline(false, Color.white);
         }
         
         private void OnDestroy()

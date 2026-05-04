@@ -34,17 +34,12 @@ namespace Data
         public Sprite sprite;
         public int count = 4;
         [TextArea(2, 5)] public string desc;
-
-        [Header("시너지 시스템")]
-        [Tooltip("고유 시너지 규칙 (트리거+이펙트를 리스트로 조합)")]
         public List<SynergyData> synergies = new();
 
         [Header("고급 속성")]
         public bool isAdvanced;
         public int advancedBaseScore;
+        [TextArea(2, 5)] public string advancedDesc;
         public List<SynergyData> advancedSynergies = new();
-        
-        public int ActiveBaseScore => isAdvanced ? advancedBaseScore : baseScore;
-        public List<SynergyData> ActiveSynergies => isAdvanced ? advancedSynergies : synergies;
     }
 }

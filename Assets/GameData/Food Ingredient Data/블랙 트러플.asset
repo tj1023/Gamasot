@@ -27,6 +27,8 @@ MonoBehaviour:
     - rid: 8392392052938375284
   isAdvanced: 0
   advancedBaseScore: 0
+  advancedDesc: "\uC815\uC0B0 \uC2DC, \uC810\uC218\uAC00 \uAC00\uC7A5 \uB192\uC740
+    \uC7AC\uB8CC 2\uAC1C\uC758 \uC810\uC218\uB97C \uD68D\uB4DD"
   advancedSynergies:
   - trigger:
       rid: 8392392052938375285
@@ -50,4 +52,4 @@ MonoBehaviour:
       type: {class: CollectTopScoresEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:
         priority: 300
-        topCount: 1
+        topCount: 2

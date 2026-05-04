@@ -149,8 +149,15 @@ namespace Gameplay.Systems
         {
             if (evt.NewPhase != GamePhase.OnScoop) return;
 
-            var ctx = GameManager.Instance.Context;
+            StartCoroutine(DelayOnRoundStart());
+        }
 
+        private System.Collections.IEnumerator DelayOnRoundStart()
+        {
+            // IngredientManager가 같은 PhaseChangedEvent에서 스폰을 완료하도록 1프레임 대기
+            yield return null;
+
+            var ctx = GameManager.Instance.Context;
             foreach (var (trinket, count) in ctx.TrinketCounts)
             {
                 trinket.effect?.OnRoundStart(ctx, count, _services);

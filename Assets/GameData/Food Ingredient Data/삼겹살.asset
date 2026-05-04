@@ -22,6 +22,7 @@ MonoBehaviour:
   synergies: []
   isAdvanced: 0
   advancedBaseScore: 40
+  advancedDesc: "\uD6A8\uACFC \uC5C6\uC74C"
   advancedSynergies: []
   references:
     version: 2

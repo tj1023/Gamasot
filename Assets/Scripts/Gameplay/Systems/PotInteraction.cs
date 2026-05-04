@@ -133,7 +133,7 @@ namespace Gameplay.Systems
                 if (node != null && node.gameObject.activeInHierarchy)
                 {
                     _currentFrameHovered.Add(node);
-                    node.SetOutline(true, _outlineColor);
+                    node.SetHoverOutline(true, _outlineColor);
                     _hoveredIngredients.Add(node);
                 }
             }
@@ -145,7 +145,7 @@ namespace Gameplay.Systems
                 {
                     if (node != null && node.gameObject.activeInHierarchy)
                     {
-                        node.SetOutline(false, _outlineColor);
+                        node.SetHoverOutline(false, _outlineColor);
                     }
                     return true; // remove from hashset
                 }
@@ -161,7 +161,7 @@ namespace Gameplay.Systems
                 {
                     if (node != null && node.gameObject.activeInHierarchy)
                     {
-                        node.SetOutline(false, _outlineColor);
+                        node.SetHoverOutline(false, _outlineColor);
                     }
                 }
                 _hoveredIngredients.Clear();
