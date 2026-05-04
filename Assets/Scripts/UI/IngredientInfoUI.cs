@@ -27,6 +27,7 @@ namespace UI
         [SerializeField] private Color legendaryColor;
 
         private FoodIngredientData _currentData;
+        private bool _isShowingAdvanced;
 
         /// <summary>
         /// 외부에서 등록하는 선택 콜백. 이 UI가 클릭되면 호출됩니다.
@@ -36,11 +37,12 @@ namespace UI
         /// <summary>
         /// FoodIngredientData를 통해 UI를 갱신합니다.
         /// </summary>
-        public void Setup(FoodIngredientData data)
+        public void Setup(FoodIngredientData data, bool showAdvanced = false)
         {
             if (data == null) return;
 
             _currentData = data;
+            _isShowingAdvanced = showAdvanced;
 
             // 이미지 세팅
             if (ingredientIcon != null)
@@ -51,9 +53,8 @@ namespace UI
 
             // 텍스트 정보 세팅
             if (nameText != null) nameText.text = data.ingredientName;
-            if (scoreText != null) scoreText.text = $"{data.baseScore}";
             if (typeText != null) typeText.text = $"{data.type}";
-            if (descText != null) descText.text = data.desc;
+            UpdateTextDisplay();
 
             // 희귀도에 따른 패널 배경색 변경
             if (panelBackground != null)
@@ -81,6 +82,26 @@ namespace UI
             if (_currentData != null)
             {
                 OnSelected?.Invoke(_currentData);
+            }
+        }
+
+        public void ToggleAdvancedMode(bool showAdvanced)
+        {
+            _isShowingAdvanced = showAdvanced;
+            UpdateTextDisplay();
+        }
+
+        private void UpdateTextDisplay()
+        {
+            if (_currentData == null) return;
+
+            if (scoreText != null) 
+            {
+                scoreText.text = _isShowingAdvanced ? $"{_currentData.advancedBaseScore}" : $"{_currentData.baseScore}";
+            }
+            if (descText != null) 
+            {
+                descText.text = _isShowingAdvanced ? _currentData.advancedDesc : _currentData.desc;
             }
         }
     }

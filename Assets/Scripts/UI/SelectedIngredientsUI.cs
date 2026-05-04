@@ -23,6 +23,8 @@ namespace UI
         [SerializeField] private IngredientInfoUI ingredientInfoPrefab;
         [SerializeField] private Button showButton;
         [SerializeField] private Button backButton;
+        [SerializeField] private Button showAdvancedToggleButton;
+        [SerializeField] private GameObject advancedCheckmark;
         
         [Header("Delete Mode Settings")]
         [SerializeField] private Button deleteConfirmButton;
@@ -34,12 +36,29 @@ namespace UI
         private readonly Dictionary<IngredientInfoUI, FoodIngredientData> _selectedForDeletion = new();
         private bool _isDeleteMode;
         private int _requiredDeleteCount;
+        private bool _isShowingAdvanced;
 
         private void Awake()
         {
             if (showButton != null) showButton.onClick.AddListener(Show);
             if (backButton != null) backButton.onClick.AddListener(Hide);
             if (deleteConfirmButton != null) deleteConfirmButton.onClick.AddListener(ConfirmDeletion);
+            if (showAdvancedToggleButton != null) showAdvancedToggleButton.onClick.AddListener(ToggleAdvancedMode);
+        }
+
+        private void ToggleAdvancedMode()
+        {
+            _isShowingAdvanced = !_isShowingAdvanced;
+            
+            if (advancedCheckmark != null)
+            {
+                advancedCheckmark.SetActive(_isShowingAdvanced);
+            }
+
+            foreach (var item in _spawnedItems)
+            {
+                if (item != null) item.ToggleAdvancedMode(_isShowingAdvanced);
+            }
         }
 
         private void OnEnable()
@@ -180,7 +199,7 @@ namespace UI
         private void AddIngredient(FoodIngredientData data)
         {
             var ui = Instantiate(ingredientInfoPrefab, contentContainer);
-            ui.Setup(data);
+            ui.Setup(data, _isShowingAdvanced);
             
             // 프리팹에 Button이 없을 수 있으므로 동적으로 추가
             if (!ui.TryGetComponent<Button>(out var btn))

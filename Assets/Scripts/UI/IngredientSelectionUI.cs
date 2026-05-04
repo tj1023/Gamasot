@@ -23,6 +23,8 @@ namespace UI
         [SerializeField] private IngredientInfoUI infoPrefab;
         [SerializeField] private GameObject darkBackground;
         [SerializeField] private Button skipButton;
+        [SerializeField] private Button showAdvancedToggleButton;
+        [SerializeField] private GameObject advancedCheckmark;
 
         [Header("Selection Settings")]
         [SerializeField, Tooltip("한 번에 표시할 후보 재료 수")]
@@ -40,6 +42,7 @@ namespace UI
         private IngredientInfoUI[] _cards;
         private bool _initialized;
         private bool _isDiscoverMode;
+        private bool _isShowingAdvanced;
 
         private void Awake()
         {
@@ -48,6 +51,31 @@ namespace UI
             if (skipButton != null)
             {
                 skipButton.onClick.AddListener(OnSkipButtonClicked);
+            }
+            if (showAdvancedToggleButton != null)
+            {
+                showAdvancedToggleButton.onClick.AddListener(ToggleAdvancedMode);
+            }
+        }
+
+        private void ToggleAdvancedMode()
+        {
+            _isShowingAdvanced = !_isShowingAdvanced;
+            
+            if (advancedCheckmark != null)
+            {
+                advancedCheckmark.SetActive(_isShowingAdvanced);
+            }
+
+            if (_cards != null)
+            {
+                foreach (var card in _cards)
+                {
+                    if (card != null && card.gameObject.activeSelf)
+                    {
+                        card.ToggleAdvancedMode(_isShowingAdvanced);
+                    }
+                }
             }
         }
 
@@ -176,7 +204,7 @@ namespace UI
 
             for (int i = 0; i < selected.Count; i++)
             {
-                _cards[i].Setup(selected[i]);
+                _cards[i].Setup(selected[i], _isShowingAdvanced);
                 _cards[i].OnSelected = OnIngredientSelected;
                 _cards[i].gameObject.SetActive(true);
             }
