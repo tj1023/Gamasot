@@ -28,6 +28,11 @@ namespace UI
         [SerializeField, Tooltip("한 번에 표시할 후보 재료 수")]
         private int candidateCount = 3;
 
+        [Header("Rarity Weights")]
+        [SerializeField, Tooltip("Common 출현 가중치")] private float commonWeight = 6f;
+        [SerializeField, Tooltip("Rare 출현 가중치")] private float rareWeight = 3f;
+        [SerializeField, Tooltip("Legendary 출현 가중치")] private float legendaryWeight = 1f;
+
         [Header("Data Source")]
         [SerializeField, Tooltip("전체 재료 후보 풀")]
         private FoodIngredientData[] ingredientPool;
@@ -124,28 +129,62 @@ namespace UI
 
             if(rootPanel != null) rootPanel.SetActive(true);
 
-            // Fisher-Yates 부분 셔플로 중복 없는 무작위 후보 선택 (GC 할당 최소화)
+            // 레어도에 따른 재료 카드 출현 비율 (Common 60%, Rare 30%, Legendary 10%)
             int count = Mathf.Min(candidateCount, candidates.Count);
 
-            var indices = ListPool<int>.Get();
-            for (int i = 0; i < candidates.Count; i++)
-                indices.Add(i);
+            var commons = ListPool<FoodIngredientData>.Get();
+            var rares = ListPool<FoodIngredientData>.Get();
+            var legendaries = ListPool<FoodIngredientData>.Get();
 
-            for (int i = 0; i < count; i++)
+            foreach (var data in candidates)
             {
-                int randomIndex = Random.Range(i, indices.Count);
-                (indices[i], indices[randomIndex]) = (indices[randomIndex], indices[i]);
+                if (data.rarity == Rarity.Common) commons.Add(data);
+                else if (data.rarity == Rarity.Rare) rares.Add(data);
+                else if (data.rarity == Rarity.Legendary) legendaries.Add(data);
+                else commons.Add(data);
             }
 
+            var selected = ListPool<FoodIngredientData>.Get();
+            float totalWeight = commonWeight + rareWeight + legendaryWeight;
+
             for (int i = 0; i < count; i++)
             {
-                FoodIngredientData data = candidates[indices[i]];
-                _cards[i].Setup(data);
+                float roll = Random.Range(0f, totalWeight);
+                System.Collections.Generic.List<FoodIngredientData> targetPool = null;
+
+                if (roll < commonWeight && commons.Count > 0) targetPool = commons;
+                else if (roll < commonWeight + rareWeight && rares.Count > 0) targetPool = rares;
+                else if (legendaries.Count > 0) targetPool = legendaries;
+
+                // Fallback: 지정된 레어도의 카드가 소진된 경우 다른 레어도에서 가져옴
+                if (targetPool == null)
+                {
+                    if (commons.Count > 0) targetPool = commons;
+                    else if (rares.Count > 0) targetPool = rares;
+                    else if (legendaries.Count > 0) targetPool = legendaries;
+                }
+
+                if (targetPool != null && targetPool.Count > 0)
+                {
+                    int idx = Random.Range(0, targetPool.Count);
+                    selected.Add(targetPool[idx]);
+                    
+                    targetPool[idx] = targetPool[targetPool.Count - 1];
+                    targetPool.RemoveAt(targetPool.Count - 1);
+                }
+            }
+
+            for (int i = 0; i < selected.Count; i++)
+            {
+                _cards[i].Setup(selected[i]);
                 _cards[i].OnSelected = OnIngredientSelected;
                 _cards[i].gameObject.SetActive(true);
             }
 
-            ListPool<int>.Release(indices);
+            ListPool<FoodIngredientData>.Release(commons);
+            ListPool<FoodIngredientData>.Release(rares);
+            ListPool<FoodIngredientData>.Release(legendaries);
+            ListPool<FoodIngredientData>.Release(selected);
 
             for (int i = count; i < candidateCount; i++)
             {
