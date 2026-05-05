@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
-
 using Core;
+using Data;
 using Interfaces;
 
 namespace UI
@@ -10,13 +10,15 @@ namespace UI
     /// 상단 또는 화면에 타이머, 라운드 정보, 점수 등을 표시하는 UI 컴포넌트입니다.
     /// </summary>
     public class GameInfoUI : MonoBehaviour, 
+        IEventListener<PhaseChangedEvent>,
         IEventListener<TimerUpdatedEvent>,
         IEventListener<ScoopCountUpdatedEvent>,
         IEventListener<TotalScoreUpdatedEvent>,
         IEventListener<RoundScoreUpdatedEvent>,
         IEventListener<RoundUpdatedEvent>
     {
-        [Header("UI Text References")]
+        [Header("UI References")]
+        [SerializeField] private GameObject infoPanel;
         [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private TextMeshProUGUI scoopCountText;
         [SerializeField] private TextMeshProUGUI totalScoreText;
@@ -46,6 +48,7 @@ namespace UI
 
         private void OnEnable()
         {
+            EventBus<PhaseChangedEvent>.Subscribe(this);
             EventBus<TimerUpdatedEvent>.Subscribe(this);
             EventBus<ScoopCountUpdatedEvent>.Subscribe(this);
             EventBus<TotalScoreUpdatedEvent>.Subscribe(this);
@@ -55,11 +58,20 @@ namespace UI
 
         private void OnDisable()
         {
+            EventBus<PhaseChangedEvent>.Unsubscribe(this);
             EventBus<TimerUpdatedEvent>.Unsubscribe(this);
             EventBus<ScoopCountUpdatedEvent>.Unsubscribe(this);
             EventBus<TotalScoreUpdatedEvent>.Unsubscribe(this);
             EventBus<RoundScoreUpdatedEvent>.Unsubscribe(this);
             EventBus<RoundUpdatedEvent>.Unsubscribe(this);
+        }
+
+        public void OnEvent(PhaseChangedEvent eventData)
+        {
+            if (infoPanel == null) return;
+
+            bool show = eventData.NewPhase != GamePhase.Ready && eventData.NewPhase != GamePhase.GameOver;
+            infoPanel.SetActive(show);
         }
 
         public void OnEvent(TimerUpdatedEvent eventData)

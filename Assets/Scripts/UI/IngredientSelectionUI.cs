@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
@@ -128,6 +129,8 @@ namespace UI
                     break;
                 case GamePhase.OnScoop:
                 case GamePhase.OnSettlement:
+                case GamePhase.Ready:
+                case GamePhase.GameOver:
                     HideCandidates();
                     break;
             }
@@ -151,7 +154,7 @@ namespace UI
             ShowCandidates(ingredientPool);
         }
 
-        private void ShowCandidates(System.Collections.Generic.IList<FoodIngredientData> candidates)
+        private void ShowCandidates(IList<FoodIngredientData> candidates)
         {
             if (candidates == null || candidates.Count == 0) return;
 
@@ -178,7 +181,7 @@ namespace UI
             for (int i = 0; i < count; i++)
             {
                 float roll = Random.Range(0f, totalWeight);
-                System.Collections.Generic.List<FoodIngredientData> targetPool = null;
+                List<FoodIngredientData> targetPool = null;
 
                 if (roll < commonWeight && commons.Count > 0) targetPool = commons;
                 else if (roll < commonWeight + rareWeight && rares.Count > 0) targetPool = rares;
@@ -192,12 +195,12 @@ namespace UI
                     else if (legendaries.Count > 0) targetPool = legendaries;
                 }
 
-                if (targetPool != null && targetPool.Count > 0)
+                if (targetPool is { Count: > 0 })
                 {
                     int idx = Random.Range(0, targetPool.Count);
                     selected.Add(targetPool[idx]);
                     
-                    targetPool[idx] = targetPool[targetPool.Count - 1];
+                    targetPool[idx] = targetPool[^1];
                     targetPool.RemoveAt(targetPool.Count - 1);
                 }
             }

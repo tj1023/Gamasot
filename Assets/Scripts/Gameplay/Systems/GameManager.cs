@@ -22,10 +22,12 @@ namespace Gameplay.Systems
         public GameContext Context { get; private set; }
         private StateMachine<GameContext> _stateMachine;
 
+        private ReadyState _readyState;
         private SelectionState _selectionState;
         private PlayingState _playingState;
         private SettlementState _settlementState;
         private TrinketSelectionState _trinketSelectionState;
+        private GameOverState _gameOverState;
 
         private Action _onExcessResolved;
 
@@ -42,10 +44,12 @@ namespace Gameplay.Systems
             Context = new GameContext();
             _stateMachine = new StateMachine<GameContext>(Context);
 
+            _readyState = new ReadyState();
             _selectionState = new SelectionState();
             _playingState = new PlayingState();
             _settlementState = new SettlementState();
             _trinketSelectionState = new TrinketSelectionState();
+            _gameOverState = new GameOverState();
         }
 
         private void Start()
@@ -57,8 +61,8 @@ namespace Gameplay.Systems
             EventBus<GamePausedEvent>.Subscribe(this);
             EventBus<ExcessDeletedEvent>.Subscribe(this);
 
-            // 초기 상태: 재료 선택부터 시작
-            _stateMachine.ChangeState(_selectionState);
+            // 초기 상태: 게임 시작 대기 화면
+            _stateMachine.ChangeState(_readyState);
         }
 
         private void Update()
@@ -85,6 +89,9 @@ namespace Gameplay.Systems
         {
             switch (evt.TargetPhase)
             {
+                case GamePhase.Ready:
+                    _stateMachine.ChangeState(_readyState);
+                    break;
                 case GamePhase.OnTrinketSelection:
                     _stateMachine.ChangeState(_trinketSelectionState);
                     break;
@@ -96,6 +103,9 @@ namespace Gameplay.Systems
                     break;
                 case GamePhase.OnScoop:
                     _stateMachine.ChangeState(_playingState);
+                    break;
+                case GamePhase.GameOver:
+                    _stateMachine.ChangeState(_gameOverState);
                     break;
             }
         }

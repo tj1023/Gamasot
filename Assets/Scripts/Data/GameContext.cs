@@ -5,10 +5,12 @@ namespace Data
     public enum GamePhase
     {
         None,
+        Ready,
         OnTrinketSelection,
         OnSelection,
         OnScoop,
-        OnSettlement
+        OnSettlement,
+        GameOver
     }
 
     /// <summary>
@@ -27,6 +29,7 @@ namespace Data
         public GamePhase CurrentPhase { get; set; }
         
         // 라운드 및 수집 제한 데이터
+        public static int MaxRound => 10;
         public int CurrentRound { get; set; } = 1;
         public int MaxScoopCount { get; set; } = 3;
         public int RemainScoopCount { get; set; }

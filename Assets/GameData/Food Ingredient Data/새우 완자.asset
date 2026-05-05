@@ -31,12 +31,15 @@ MonoBehaviour:
     \uC810\uC218 +8"
   advancedSynergies:
   - trigger:
-      rid: 8392392052938375274
+      rid: 6454355475856621638
     effects:
     - rid: 8392392052938375276
   references:
     version: 2
     RefIds:
+    - rid: 6454355475856621638
+      type: {class: OnScoopTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
+      data: 
     - rid: 8392392052938375249
       type: {class: OnScoopTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data: 
@@ -48,9 +51,6 @@ MonoBehaviour:
         bonusScore: 4
         ingredientFilter: 1
         delay: 0.5
-    - rid: 8392392052938375274
-      type: {class: OnSettlementTrigger, ns: Gameplay.Synergies, asm: Assembly-CSharp}
-      data: 
     - rid: 8392392052938375276
       type: {class: BonusToGroupEffect, ns: Gameplay.Synergies, asm: Assembly-CSharp}
       data:

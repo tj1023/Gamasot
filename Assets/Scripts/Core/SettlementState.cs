@@ -123,6 +123,13 @@ namespace Core
             context.CurrentRound++;
             context.HarvestedIngredients.Clear();
 
+            // 최대 라운드에 도달하면 게임 오버
+            if (GameContext.MaxRound > 0 && context.CurrentRound > GameContext.MaxRound)
+            {
+                EventBus<RequestPhaseChangeEvent>.Publish(new RequestPhaseChangeEvent { TargetPhase = GamePhase.GameOver });
+                return;
+            }
+
             EventBus<RequestPhaseChangeEvent>.Publish(context.CurrentRound % 3 == 0
                 ? new RequestPhaseChangeEvent { TargetPhase = GamePhase.OnTrinketSelection }
                 : new RequestPhaseChangeEvent { TargetPhase = GamePhase.OnSelection });
