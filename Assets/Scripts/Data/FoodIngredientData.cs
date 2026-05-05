@@ -6,14 +6,14 @@ namespace Data
     public enum IngredientType
     {
         None = 0,
-        Meat = 1,
-        Vegetable = 2,
-        Mushroom = 3,
-        Ball = 4,
-        Carb = 5,
-        Seafood = 6,
-        // Spice = 7,
-        // Sauce = 8
+        육류 = 1,
+        채소 = 2,
+        버섯 = 3,
+        완자 = 4,
+        주식 = 5,
+        해산물 = 6,
+        // 향신료 = 7,
+        // 소스 = 8
     }
 
     public enum Rarity
