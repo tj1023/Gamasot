@@ -80,7 +80,7 @@ namespace UI
 
             if (highScoreText != null)
             {
-                highScoreText.text = $"최고 점수: {highScore}";
+                highScoreText.text = $"{highScore}";
             }
         }
 
