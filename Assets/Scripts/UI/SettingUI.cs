@@ -45,13 +45,13 @@ namespace UI
         private void OpenSetting()
         {
             settingPanel.SetActive(true);
-            Time.timeScale = 0f;
+            EventBus<GamePausedEvent>.Publish(new GamePausedEvent { IsPaused = true });
         }
 
         private void CloseSetting()
         {
             settingPanel.SetActive(false);
-            Time.timeScale = 1f;
+            EventBus<GamePausedEvent>.Publish(new GamePausedEvent { IsPaused = false });
         }
 
         private static void OnVolumeChanged(float value)
