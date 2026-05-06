@@ -91,7 +91,7 @@ namespace Core
                 processedEffects.Add((source, modifier));
 
                 float elapsedTime = Time.unscaledTime - startTime;
-                if (elapsedTime > 8f)
+                if (elapsedTime > 7f)
                 {
                     Time.timeScale = 2f;
                 }

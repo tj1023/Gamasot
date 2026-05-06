@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ad15609f86f3a9943a95f773ea620ec4
+guid: 065fd40cff2484c4aa43538a101e7576
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1198477067713850731
-    second: Panel_0
+      213: 8449625988310101665
+    second: Boogie_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Panel_0
+      name: Boogie_0
       rect:
         serializedVersion: 2
-        x: 279
-        y: 108
-        width: 1137
-        height: 2363
+        x: 0
+        y: 15
+        width: 230
+        height: 199
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 592d67be4772e5fe0800000000000000
-      internalID: -1198477067713850731
+      spriteID: 1aee12e711a134570800000000000000
+      internalID: 8449625988310101665
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Panel_0: -1198477067713850731
+      Boogie_0: 8449625988310101665
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

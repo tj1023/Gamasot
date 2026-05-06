@@ -14,7 +14,7 @@ namespace Data
         [Range(0f, 1f)] public float bgmVolume = 0.5f;
 
         [Header("SFX")]
-        public AudioClip click;
+        public AudioClip select;
         [Range(0f, 1f)] public float clickVolume = 1f;
 
         public AudioClip scoop;

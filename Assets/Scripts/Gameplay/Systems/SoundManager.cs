@@ -81,12 +81,12 @@ namespace Gameplay.Systems
 
         public void OnEvent(IngredientSelectedEvent eventData)
         {
-            PlaySfx(soundData.click, soundData.clickVolume);
+            PlaySfx(soundData.select, soundData.clickVolume);
         }
 
         public void OnEvent(TrinketSelectedEvent eventData)
         {
-            PlaySfx(soundData.click, soundData.clickVolume);
+            PlaySfx(soundData.select, soundData.clickVolume);
         }
 
         public void OnEvent(ItemsHarvestedEvent eventData)
