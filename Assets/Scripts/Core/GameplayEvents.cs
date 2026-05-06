@@ -103,4 +103,12 @@ namespace Core
     public struct OwnedTrinketsUpdatedEvent
     {
     }
+
+    public struct SynergyActivatedEvent
+    {
+    }
+
+    public struct TrailArrivedEvent
+    {
+    }
 }

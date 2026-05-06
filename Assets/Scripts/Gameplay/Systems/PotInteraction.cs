@@ -325,6 +325,7 @@ namespace Gameplay.Systems
             while (commandQueue.Count > 0)
             {
                 var command = commandQueue.Dequeue();
+                EventBus<SynergyActivatedEvent>.Publish(new SynergyActivatedEvent());
                 yield return command.ExecuteAsync();
             }
         }

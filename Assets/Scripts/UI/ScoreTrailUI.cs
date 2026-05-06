@@ -146,6 +146,7 @@ namespace UI
             }
 
             obj.transform.position = end;
+            EventBus<TrailArrivedEvent>.Publish(new TrailArrivedEvent());
 
             // 대기 시간: 프리팹의 TrailRenderer Trail Time 에 맞춰 꼬리가 사라질때까지 대기
             float waitTime = tr != null ? tr.time : 0.2f;

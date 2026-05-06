@@ -168,7 +168,7 @@ namespace Gameplay.Systems
             {
                 ApplyOutline(true, _hoverColor);
             }
-            else if (RuntimeData != null && RuntimeData.IsAdvanced)
+            else if (RuntimeData is { IsAdvanced: true })
             {
                 ApplyOutline(true, AdvancedOutlineColor);
             }

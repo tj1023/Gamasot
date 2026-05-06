@@ -91,7 +91,7 @@ namespace Core
                 processedEffects.Add((source, modifier));
 
                 float elapsedTime = Time.unscaledTime - startTime;
-                if (elapsedTime > 10f)
+                if (elapsedTime > 8f)
                 {
                     Time.timeScale = 2f;
                 }
@@ -99,6 +99,7 @@ namespace Core
                 var cmd = modifier.GenerateCommand(context, source);
                 if (cmd != null)
                 {
+                    EventBus<SynergyActivatedEvent>.Publish(new SynergyActivatedEvent());
                     yield return cmd.ExecuteAsync();
                 }
             }

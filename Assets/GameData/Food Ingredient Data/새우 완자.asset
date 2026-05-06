@@ -57,5 +57,5 @@ MonoBehaviour:
         priority: 100
         targetList: 1
         bonusScore: 8
-        ingredientFilter: 0
+        ingredientFilter: 1
         delay: 0.5
