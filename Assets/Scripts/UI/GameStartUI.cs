@@ -17,6 +17,7 @@ namespace UI
         [SerializeField] private GameObject rootPanel;
         [SerializeField] private Button startButton;
         [SerializeField] private TextMeshProUGUI titleText;
+        [SerializeField] private TextMeshProUGUI highScoreText;
 
         private void Awake()
         {
@@ -51,6 +52,12 @@ namespace UI
         private void Show()
         {
             if (rootPanel != null) rootPanel.SetActive(true);
+
+            if (highScoreText != null)
+            {
+                int highScore = PlayerPrefs.GetInt("HighScore", 0);
+                highScoreText.text = $"최고 점수: {highScore}";
+            }
         }
 
         private void Hide()

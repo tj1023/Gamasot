@@ -21,6 +21,7 @@ namespace UI
         [SerializeField] private TextMeshProUGUI finalScoreText;
         [SerializeField] private TextMeshProUGUI roundInfoText;
         [SerializeField] private TextMeshProUGUI gameOverTitleText;
+        [SerializeField] private TextMeshProUGUI highScoreText;
 
         private void Awake()
         {
@@ -57,15 +58,29 @@ namespace UI
             if (rootPanel != null) rootPanel.SetActive(true);
 
             var context = GameManager.Instance.Context;
+            int currentScore = context.TotalScore;
+            int highScore = PlayerPrefs.GetInt("HighScore", 0);
+
+            if (currentScore > highScore)
+            {
+                highScore = currentScore;
+                PlayerPrefs.SetInt("HighScore", highScore);
+                PlayerPrefs.Save();
+            }
 
             if (finalScoreText != null)
             {
-                finalScoreText.text = $"{context.TotalScore}";
+                finalScoreText.text = $"{currentScore}";
             }
 
             if (roundInfoText != null)
             {
                 roundInfoText.text = $"라운드 {context.CurrentRound - 1} 완료";
+            }
+
+            if (highScoreText != null)
+            {
+                highScoreText.text = $"최고 점수: {highScore}";
             }
         }
 
