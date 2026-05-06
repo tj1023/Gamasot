@@ -18,8 +18,6 @@ namespace Gameplay.Commands
 
         public IEnumerator ExecuteAsync()
         {
-            float trailDuration = _delay; 
-
             foreach (var item in _context.HarvestedIngredients)
             {
                 if (item is { CurrentScore: > 0 })
@@ -29,11 +27,11 @@ namespace Gameplay.Commands
                     {
                         SourceIngredient = item,
                         TargetType = EffectTargetType.TotalScore, 
-                        Duration = trailDuration
+                        Duration = _delay
                     });
 
                     // 꼬리가 목표에 도달할 때까지 대기
-                    yield return WaitCache.Seconds(trailDuration);
+                    yield return WaitCache.Seconds(_delay);
 
                     // 점수는 RoundScore에 누계
                     _context.RoundScore += item.CurrentScore;

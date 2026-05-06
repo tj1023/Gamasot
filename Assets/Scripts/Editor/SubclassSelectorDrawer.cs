@@ -72,8 +72,13 @@ namespace Editor
             // Missing type 경고 표시
             if (isMissing)
             {
-                var warningStyle = new GUIStyle(EditorStyles.popup);
-                warningStyle.normal.textColor = Color.red;
+                var warningStyle = new GUIStyle(EditorStyles.popup)
+                {
+                    normal =
+                    {
+                        textColor = Color.red
+                    }
+                };
                 EditorGUI.LabelField(dropdownRect, $"⚠ Missing: {property.managedReferenceFullTypename}", warningStyle);
             }
             else

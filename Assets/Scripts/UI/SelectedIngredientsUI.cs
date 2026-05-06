@@ -228,11 +228,7 @@ namespace UI
 
         private void OnCardClickedForDeletion(FoodIngredientData data, IngredientInfoUI ui)
         {
-            if (_selectedForDeletion.ContainsKey(ui))
-            {
-                _selectedForDeletion.Remove(ui);
-            }
-            else
+            if (!_selectedForDeletion.Remove(ui))
             {
                 if (_selectedForDeletion.Count < _requiredDeleteCount)
                 {

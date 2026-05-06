@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Core;
 using Data;
@@ -104,7 +105,7 @@ namespace Gameplay.Systems
             PlaySfx(soundData.trailArrive, soundData.trailArriveVolume);
         }
 
-        private System.Collections.Generic.Dictionary<AudioClip, float> _lastPlayedTime = new();
+        private readonly Dictionary<AudioClip, float> _lastPlayedTime = new();
 
         private void PlaySfx(AudioClip clip, float volume)
         {
